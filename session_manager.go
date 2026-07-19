@@ -233,8 +233,9 @@ func (p *ParametersConfig) Validate(data any) error {
 
 // Components holds the reusable components of the sessions and schema
 type Components struct {
-	Prompts map[string]string        `yaml:"prompts" json:"prompts,omitempty"`
-	Schemas map[string]schema.Schema `yaml:"schemas" json:"schemas,omitempty"`
+	Prompts map[string]string          `yaml:"prompts" json:"prompts,omitempty"`
+	Schemas map[string]schema.Schema   `yaml:"schemas" json:"schemas,omitempty"`
+	Scripts map[string]ScriptComponent `yaml:"scripts" json:"scripts,omitempty"`
 }
 
 // NewSessionManager creates a new SessionManager.

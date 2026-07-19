@@ -17,7 +17,20 @@
 
 package frags
 
-import "github.com/theirish81/frags/util"
+import (
+	"github.com/theirish81/frags/util"
+)
+
+type ScriptType string
+
+const Code ScriptType = "code"
+const Kbs ScriptType = "kes"
+
+type ScriptComponent struct {
+	Type      ScriptType `yaml:"type" json:"type"`
+	Script    string     `yaml:"script" json:"script"`
+	Arguments Parameters `yaml:"arguments" json:"arguments"`
+}
 
 // ScriptEngine is the interface that wraps the RunCode method. Frags provides NO script engines, it's the program
 // that includes Frags that provides one, if necessary. Beware though, most script engines pose a security risk.
@@ -29,4 +42,14 @@ type DummyScriptEngine struct{}
 
 func (d *DummyScriptEngine) RunCode(_ *util.FragsContext, _ string, _ any, _ ExportableRunner) (any, error) {
 	return make(map[string]any), nil
+}
+
+type KbsEngine interface {
+	Run(ctx *util.FragsContext, code string, query string, runner ExportableRunner) (any, error)
+}
+
+type DummyKbsEngine struct{}
+
+func (d *DummyKbsEngine) Run(ctx *util.FragsContext, code string, query string, runner ExportableRunner) (any, error) {
+	return make([]map[string]any, 0), nil
 }

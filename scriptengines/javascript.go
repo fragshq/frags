@@ -18,6 +18,7 @@
 package scriptengines
 
 import (
+	"errors"
 	"time"
 
 	"github.com/dop251/goja"
@@ -48,6 +49,19 @@ func (e *JavascriptScriptingEngine) RunCode(ctx *util.FragsContext, code string,
 		args = params
 	}
 	if err := vm.Set("args", args); err != nil {
+		return nil, err
+	}
+	if err := vm.Set("runScript", func(name string) any {
+		component, exists := runner.Components().Scripts[name]
+		if !exists {
+			panic(vm.NewTypeError(errors.New("script not found")))
+		}
+		res, err := e.RunCode(ctx, component.Script, params, runner)
+		if err != nil {
+			panic(vm.NewTypeError(err.Error()))
+		}
+		return res
+	}); err != nil {
 		return nil, err
 	}
 	if err := vm.Set("runFunction", func(name string, args map[string]any) any {

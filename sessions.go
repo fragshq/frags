@@ -11,7 +11,7 @@ import (
 
 // Sessions is an ordered map of session IDs to sessions.
 type Sessions struct {
-	Data  map[string]Session `validate:"required,min=1"`
+	Data  map[string]Session `validate:"required"`
 	Order []string
 }
 

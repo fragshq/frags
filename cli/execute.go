@@ -79,6 +79,7 @@ func execute(ctx *util.FragsContext, sm frags.SessionManager, paramsMap map[stri
 		frags.WithSessionWorkers(workers),
 		frags.WithLogger(logger),
 		frags.WithScriptEngine(scriptengines.NewJavascriptScriptingEngine()),
+		frags.WithKbsEngine(scriptengines.NewPrologEngine()),
 		frags.WithExternalFunctions(functions),
 		frags.WithToolsDefinitions(definitions),
 		frags.WithInternalDatabase(db),

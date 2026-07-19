@@ -41,7 +41,9 @@ type ExportableRunner interface {
 	Transformers() *Transformers
 	RunFunction(ctx *util.FragsContext, name string, args map[string]any) (any, error)
 	ScriptEngine() ScriptEngine
+	KbsEngine() KbsEngine
 	Logger() *log.StreamerLogger
+	Components() Components
 }
 
 // Runner is a struct that runs a session manager.
@@ -60,6 +62,7 @@ type Runner struct {
 	running           bool
 	logger            *log.StreamerLogger
 	scriptEngine      ScriptEngine
+	kbsEngine         KbsEngine
 	kFormat           bool
 	vars              evaluators.Vars
 	ExternalFunctions ExternalFunctions
@@ -93,6 +96,7 @@ type RunnerOptions struct {
 	logger            *log.StreamerLogger
 	kFormat           bool
 	scriptEngine      ScriptEngine
+	kbsEngine         KbsEngine
 	externalFunctions ExternalFunctions
 	toolsDefinitions  ToolDefinitions
 	db                *zealql.Database
@@ -118,6 +122,12 @@ func WithSessionWorkers(sessionWorkers int) RunnerOption {
 func WithScriptEngine(scriptEngine ScriptEngine) RunnerOption {
 	return func(o *RunnerOptions) {
 		o.scriptEngine = scriptEngine
+	}
+}
+
+func WithKbsEngine(kbsEngine KbsEngine) RunnerOption {
+	return func(o *RunnerOptions) {
+		o.kbsEngine = kbsEngine
 	}
 }
 
@@ -165,6 +175,7 @@ func NewRunner(sessionManager SessionManager, resourceLoader resources.ResourceL
 		logger:            opts.logger,
 		kFormat:           opts.kFormat,
 		scriptEngine:      opts.scriptEngine,
+		kbsEngine:         opts.kbsEngine,
 		ExternalFunctions: opts.externalFunctions,
 		ToolsDefinitions:  opts.toolsDefinitions,
 		vars:              make(evaluators.Vars),
@@ -367,6 +378,11 @@ func (r *Runner) runSession(ctx *util.FragsContext, sessionID string, session Se
 			if err := r.runPrePrompts(ctx, ai, sessionID, session, itIdx, scope, aiContext, ppResources); err != nil {
 				return err
 			}
+		}
+		// if the session has no prePrompt or prompt, it means this session most likely contains just
+		// calls, so no reason to involve AI in any way.
+		if !session.HasPrePrompt() && !session.HasPrompt() {
+			return nil
 		}
 		pResources := append(localResources, sessionResources.FilterPromptResources()...)
 		if err := r.runPrompt(ctx, ai, sessionID, session, itIdx, scope, aiContext, pResources); err != nil {
@@ -691,6 +707,19 @@ func (r *Runner) ScriptEngine() ScriptEngine {
 		return &DummyScriptEngine{}
 	}
 	return r.scriptEngine
+}
+
+func (r *Runner) KbsEngine() KbsEngine {
+	if r.kbsEngine == nil {
+		r.logger.Warn(log.NewEvent(log.GenericEventType, log.RunnerComponent).
+			WithMessage(fmt.Sprintf("no kbs engine provided, using dummy engine")))
+		return &DummyKbsEngine{}
+	}
+	return r.kbsEngine
+}
+
+func (r *Runner) Components() Components {
+	return r.sessionManager.Components
 }
 
 // newEvalScope returns a new scope for evaluating expressions.

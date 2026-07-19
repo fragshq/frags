@@ -40,6 +40,7 @@ const (
 type FunctionCaller struct {
 	Name        string                     `yaml:"name" json:"name"`
 	Code        *string                    `yaml:"code" json:"code"`
+	KBS         *string                    `yaml:"kbs" json:"kbs"`
 	Args        map[string]any             `yaml:"args" json:"args"`
 	Description *string                    `yaml:"description" json:"description"`
 	In          *FunctionCallDestination   `yaml:"in" json:"in" validate:"omitempty,oneof=ai vars context"`
@@ -81,7 +82,7 @@ func (r *Runner) RunAllFunctionCallers(ctx *util.FragsContext, fc FunctionCaller
 		case VarsFunctionCallDestination:
 			outputVars[varName] = value
 		case ContextFunctionCallDestination:
-			if err := util.SetInContext(r.dataStructure, varName, value); err != nil {
+			if err := util.SetInContext(&r.dataStructure, varName, value); err != nil {
 				return nil, err
 			}
 		case DbFunctionCallDestination:
@@ -110,9 +111,13 @@ func (r *Runner) runFunctionCaller(ctx *util.FragsContext, fc FunctionCaller, sc
 	}
 	if fc.Func != nil {
 		return fc.Func(ctx, clonedFc.Args)
-	} else if fc.Code != nil {
-		return r.ScriptEngine().RunCode(ctx, *clonedFc.Code, clonedFc.Args, r)
-	} else {
-		return r.RunFunction(ctx, clonedFc.Name, clonedFc.Args)
 	}
+	if fc.KBS != nil {
+		engine := r.KbsEngine()
+		return engine.Run(ctx, *clonedFc.KBS, clonedFc.Args["query"].(string), r)
+	}
+	if fc.Code != nil {
+		return r.ScriptEngine().RunCode(ctx, *clonedFc.Code, clonedFc.Args, r)
+	}
+	return r.RunFunction(ctx, clonedFc.Name, clonedFc.Args)
 }
