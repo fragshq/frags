@@ -14,7 +14,9 @@ type PrologEngine struct {
 
 func (e *PrologEngine) Run(ctx *util.FragsContext, code string, query string, runner frags.ExportableRunner) (any, error) {
 	interpreter := e.init()
-	e.initializeConsult(interpreter, runner.Components())
+	if runner != nil {
+		e.initializeConsult(interpreter, runner.Components())
+	}
 	if err := interpreter.Compile(ctx, code); err != nil {
 		return nil, err
 	}

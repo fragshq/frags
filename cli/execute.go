@@ -61,7 +61,8 @@ func execute(ctx *util.FragsContext, sm frags.SessionManager, paramsMap map[stri
 		_ = mcpTools.Close()
 	}()
 	db, _ := zealql.NewDatabase()
-	zealCollection := data.New(db)
+	runnerContainer := data.RunnerContainer{}
+	zealCollection := data.New(db, sm, &runnerContainer)
 	functions = functions.WithFunctions(zealCollection.AsFunctions())
 
 	ai.SetFunctions(functions)
@@ -84,6 +85,7 @@ func execute(ctx *util.FragsContext, sm frags.SessionManager, paramsMap map[stri
 		frags.WithToolsDefinitions(definitions),
 		frags.WithInternalDatabase(db),
 	)
+	runnerContainer.ExportableRunner = &runner
 	// execute
 	return runner.Run(ctx, paramsMap)
 

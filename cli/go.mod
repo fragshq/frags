@@ -121,3 +121,4 @@ require (
 )
 
 replace github.com/theirish81/frags v1.0.0-rc1 => ../
+replace github.com/theirish81/fragsfunctions/data v0.7.0 => ../../fragsfunctions/data

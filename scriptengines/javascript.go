@@ -51,27 +51,29 @@ func (e *JavascriptScriptingEngine) RunCode(ctx *util.FragsContext, code string,
 	if err := vm.Set("args", args); err != nil {
 		return nil, err
 	}
-	if err := vm.Set("runScript", func(name string) any {
-		component, exists := runner.Components().Scripts[name]
-		if !exists {
-			panic(vm.NewTypeError(errors.New("script not found")))
+	if runner != nil {
+		if err := vm.Set("runScript", func(name string) any {
+			component, exists := runner.Components().Scripts[name]
+			if !exists {
+				panic(vm.NewTypeError(errors.New("script not found")))
+			}
+			res, err := e.RunCode(ctx, component.Script, params, runner)
+			if err != nil {
+				panic(vm.NewTypeError(err.Error()))
+			}
+			return res
+		}); err != nil {
+			return nil, err
 		}
-		res, err := e.RunCode(ctx, component.Script, params, runner)
-		if err != nil {
-			panic(vm.NewTypeError(err.Error()))
+		if err := vm.Set("runFunction", func(name string, args map[string]any) any {
+			res, err := runner.RunFunction(innerCtx, name, args)
+			if err != nil {
+				panic(vm.NewTypeError(err.Error()))
+			}
+			return res
+		}); err != nil {
+			return nil, err
 		}
-		return res
-	}); err != nil {
-		return nil, err
-	}
-	if err := vm.Set("runFunction", func(name string, args map[string]any) any {
-		res, err := runner.RunFunction(innerCtx, name, args)
-		if err != nil {
-			panic(vm.NewTypeError(err.Error()))
-		}
-		return res
-	}); err != nil {
-		return nil, err
 	}
 	res, err := vm.RunString(code)
 	if err != nil {
