@@ -3,9 +3,11 @@ package scriptengines
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
+	"github.com/ichiban/prolog/engine"
 	"github.com/stretchr/testify/require"
 	"github.com/theirish81/frags"
 	"github.com/theirish81/frags/util"
@@ -49,4 +51,14 @@ func TestPrologLoad(t *testing.T) {
 		"grandparent(CHARLIES_GRANDPARENT, charlie).", &runner)
 	fmt.Println(res)
 	fmt.Println(err)
+}
+
+func TestParser(t *testing.T) {
+	e := NewPrologEngine()
+	interpreter := e.init()
+	parser := engine.NewParser(&interpreter.VM, strings.NewReader("schedule_tasks([task('Sort marbles by color', 4, 2), task('Paint rocks', 3, 2), task('Cut wood', 2, 1)], Schedule)."))
+	parser.Term()
+	for _, v := range parser.Vars {
+		fmt.Println(v.Name)
+	}
 }
