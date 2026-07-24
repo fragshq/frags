@@ -33,7 +33,7 @@ type ScriptComponent struct {
 	Type        ScriptType `yaml:"type" json:"type"`
 	Script      string     `yaml:"script" json:"script"`
 	Description string     `yaml:"description" json:"description,omitempty"`
-	Arguments   Parameters `yaml:"arguments" json:"arguments,omitempty"`
+	Parameters  Parameters `yaml:"parameters" json:"parameters,omitempty"`
 }
 
 type ScriptComponents map[string]ScriptComponent
@@ -64,9 +64,9 @@ func (s ScriptComponents) Describe() string {
 		if len(v.Description) > 0 {
 			data += fmt.Sprintf("Description: %s\n", v.Description)
 		}
-		if v.Arguments != nil && len(v.Arguments) > 0 {
+		if v.Parameters != nil && len(v.Parameters) > 0 {
 			data += "Arguments:\n"
-			for _, a := range v.Arguments {
+			for _, a := range v.Parameters {
 				data += fmt.Sprintf("Name: %s\n", a.Name)
 				sBytes, _ := json.Marshal(a.Schema)
 				data += fmt.Sprintf("Schema:\n%s\n===\n", string(sBytes))

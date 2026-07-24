@@ -1,7 +1,6 @@
 package scriptengines
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -43,8 +42,6 @@ func (e *PrologEngine) Run(ctx *util.FragsContext, code string, query string, ru
 	if solutions.Err() != nil {
 		return nil, solutions.Err()
 	}
-	o, _ := json.Marshal(out)
-	fmt.Println(string(o))
 	return out, nil
 }
 

@@ -218,8 +218,6 @@ github.com/subosito/gotenv v1.6.0 h1:9NlTDc1FTs4qu0DDq7AEtTPNw6SVm7uBMsUCUjABIf8
 github.com/subosito/gotenv v1.6.0/go.mod h1:Dk4QP5c2W3ibzajGcXpNraDfq2IrhjMIvMSWPKKo0FU=
 github.com/theirish81/doauth v0.0.0-20260427082048-18b593885cb7 h1:JbaOgonMdFmcFv/lgiFBO48yMLbdHx9Xn9MVqAR8MMQ=
 github.com/theirish81/doauth v0.0.0-20260427082048-18b593885cb7/go.mod h1:njnhj5eJQ+3Kxe4PDiJL5gTHJkWa3TfBOmtZ3X5a7/E=
-github.com/theirish81/fml v0.1.2 h1:BcXq/TtMNdno/M38RWtVlv2GERSFRyHRZhhR5X0AjBI=
-github.com/theirish81/fml v0.1.2/go.mod h1:H73S0GEeH7bV1xrsKeY4/NuRzNBtgVGPxzuwZ/3JyuU=
 github.com/theirish81/frags/anthropic v1.0.0-rc2 h1:IpRnWgN+BGVm6k64paZ2dKkTfM06YyMhNAHBu6NlSFc=
 github.com/theirish81/frags/anthropic v1.0.0-rc2/go.mod h1:2lrPDb3tLkZx4bAHy5QaBW4WBJDHgXtAD30W0gn5b9k=
 github.com/theirish81/frags/chatgpt v1.0.0-rc3 h1:aifE856AqGZWnny0FsFZ/mbta/HlAqz1YFCn9vpjQp0=
@@ -230,8 +228,6 @@ github.com/theirish81/frags/ollama v0.25.0 h1:sDK/DLGZpspjrFy1TPNHwBsoqGRpSAHfh/
 github.com/theirish81/frags/ollama v0.25.0/go.mod h1:a85psEHBCusbZJPNojkHUPnAjRAU3jzeEHD+FfNUNTU=
 github.com/theirish81/fragsfunctions v0.6.0 h1:p0Gwr/x1Ujxuvya5NDiilRN9KuWUTuIMOcl+aCGBGdE=
 github.com/theirish81/fragsfunctions v0.6.0/go.mod h1:/14X2ABiH0ruuVI6tvOHxdK+UMU0s2f96/RR8vMuZRw=
-github.com/theirish81/fragsfunctions/data v0.7.0 h1:3SEqbkZjf1+tvktJcTGg7i/daDnbgNYayjpJ6JyWa+w=
-github.com/theirish81/fragsfunctions/data v0.7.0/go.mod h1:KfI5gYI2TWVSemDfOUJN4lDXwgnMmPK/T6aTKaNfQhc=
 github.com/theirish81/fragsfunctions/fs v0.7.0 h1:6i+zCPYq5rwRYRkBNN7jqdHIZ5ccbNp6bNmrGvZjoSU=
 github.com/theirish81/fragsfunctions/fs v0.7.0/go.mod h1:nngUyCELsDOGSIz0CCncvsUwPgulW44/NKe56lGcmjw=
 github.com/theirish81/fragsfunctions/http v0.8.0 h1:hypnhzMcpZ/kC0dOKS8iZkyRmpBLIDBxgStEjIpzDL0=
