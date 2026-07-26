@@ -18,6 +18,7 @@ type PrologEngine struct {
 
 func (e *PrologEngine) Run(ctx *util.FragsContext, code string, query string, runner frags.ExportableRunner) (any, error) {
 	localCtx := ctx.Child(30 * time.Second)
+	defer localCtx.Cancel(nil)
 	interpreter := e.init()
 	if runner != nil {
 		e.initializeConsult(interpreter, runner.Components())
