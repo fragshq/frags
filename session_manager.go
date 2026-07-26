@@ -235,6 +235,7 @@ func (p *ParametersConfig) Validate(data any) error {
 type Components struct {
 	Prompts map[string]string        `yaml:"prompts" json:"prompts,omitempty"`
 	Schemas map[string]schema.Schema `yaml:"schemas" json:"schemas,omitempty"`
+	Scripts ScriptComponents         `yaml:"scripts" json:"scripts,omitempty"`
 }
 
 // NewSessionManager creates a new SessionManager.

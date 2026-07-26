@@ -57,6 +57,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.4 // indirect
 	github.com/gorilla/websocket v1.5.3 // indirect
+	github.com/ichiban/prolog v1.2.2 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/invopop/jsonschema v0.14.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
@@ -118,3 +119,9 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
+
+replace github.com/theirish81/frags v1.0.0-rc1 => ../
+
+replace github.com/theirish81/fragsfunctions/data v0.7.0 => ../../fragsfunctions/data
+
+replace github.com/theirish81/fml v0.1.2 => ../../fml
