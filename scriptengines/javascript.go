@@ -34,7 +34,7 @@ func NewJavascriptScriptingEngine() *JavascriptScriptingEngine {
 }
 
 func (e *JavascriptScriptingEngine) RunCode(ctx *util.FragsContext, code string, params any, runner frags.ExportableRunner) (any, error) {
-	innerCtx := util.WithFragsContext(ctx, 1*time.Minute)
+	innerCtx := util.WithFragsContext(ctx, 30*time.Second)
 	defer innerCtx.Cancel(nil)
 	vm := goja.New()
 	go func() {

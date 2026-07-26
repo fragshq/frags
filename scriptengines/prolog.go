@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 	"unsafe"
 
 	"github.com/ichiban/prolog"
@@ -16,6 +17,7 @@ type PrologEngine struct {
 }
 
 func (e *PrologEngine) Run(ctx *util.FragsContext, code string, query string, runner frags.ExportableRunner) (any, error) {
+	localCtx := ctx.Child(30 * time.Second)
 	interpreter := e.init()
 	if runner != nil {
 		e.initializeConsult(interpreter, runner.Components())
@@ -26,7 +28,7 @@ func (e *PrologEngine) Run(ctx *util.FragsContext, code string, query string, ru
 	parser := engine.NewParser(&interpreter.VM, strings.NewReader(query))
 	_, err := parser.Term()
 
-	solutions, err := interpreter.Query(query)
+	solutions, err := interpreter.QueryContext(localCtx, query)
 	if err != nil {
 		return nil, err
 	}
