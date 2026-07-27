@@ -35,26 +35,6 @@ import (
 	"github.com/theirish81/frags/util"
 )
 
-var (
-	titleStyle = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.Color("#FAFAFA")).
-			Background(lipgloss.Color("#7D56F4")).
-			Padding(0, 1).
-			MarginBottom(1)
-
-	sessionTitleStyle = lipgloss.NewStyle().
-				Bold(true).
-				Foreground(lipgloss.AdaptiveColor{Light: "#0087AF", Dark: "#00D7FF"})
-
-	componentStyle = lipgloss.NewStyle().
-			Bold(true).
-			Foreground(lipgloss.AdaptiveColor{Light: "#D7005F", Dark: "#FF007F"})
-
-	messageStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.AdaptiveColor{Light: "#1C1C1C", Dark: "#E5E5E5"})
-)
-
 type runResult struct {
 	result util.ProgMap
 	err    error
