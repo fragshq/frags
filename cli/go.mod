@@ -14,7 +14,7 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/theirish81/fml v0.1.2
-	github.com/theirish81/frags v1.0.0-rc1
+	github.com/theirish81/frags v1.0.0-rc2
 	github.com/theirish81/frags/anthropic v1.0.0-rc2
 	github.com/theirish81/frags/chatgpt v1.0.0-rc3
 	github.com/theirish81/frags/gemini v1.0.0-rc0
@@ -89,7 +89,7 @@ require (
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/standard-webhooks/standard-webhooks/libraries v0.0.1 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
-	github.com/theirish81/doauth v0.0.0-20260427082048-18b593885cb7 // indirect
+	github.com/theirish81/doauth v0.0.0-20260728113914-6d4bef51ad6e // indirect
 	github.com/theirish81/fragsfunctions v0.6.0 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
