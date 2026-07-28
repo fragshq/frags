@@ -15,7 +15,7 @@ require (
 	github.com/modelcontextprotocol/go-sdk v1.6.0
 	github.com/samber/lo v1.53.0
 	github.com/stretchr/testify v1.11.1
-	github.com/theirish81/doauth v0.0.0-20260427082048-18b593885cb7
+	github.com/theirish81/doauth v0.0.0-20260728113914-6d4bef51ad6e
 	github.com/theirish81/sesat2 v0.0.0-20260511100810-8e377902d6c0
 	github.com/theirish81/zealql v0.0.0-20260513085909-eb2e76a09b48
 	golang.org/x/oauth2 v0.36.0
