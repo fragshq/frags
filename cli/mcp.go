@@ -33,15 +33,15 @@ func initMCP(e *echo.Echo) {
 			}
 			plans := make([]planDef, 0)
 			for _, entry := range files {
-				if filepath.Ext(entry.Name()) != ".yaml" {
+				if filepath.Ext(entry.Name()) != ".yaml" && filepath.Ext(entry.Name()) != ".fml" {
 					continue
 				}
 				data, err := os.ReadFile(filepath.Join(rootDir, entry.Name()))
 				if err != nil {
 					continue
 				}
-				sm := frags.NewSessionManager()
-				if err = sm.FromYAML(data); err != nil {
+				sm, err := parsePlan(entry.Name(), data)
+				if err != nil {
 					continue
 				}
 				pm := frags.Parameters{}
@@ -58,8 +58,8 @@ func initMCP(e *echo.Echo) {
 			if err != nil {
 				return nil, nil, err
 			}
-			sm := frags.NewSessionManager()
-			if err = sm.FromYAML(data); err != nil {
+			sm, err := parsePlan(args.Name, data)
+			if err != nil {
 				return nil, nil, err
 			}
 			toolsConfig, err := readToolsFile()

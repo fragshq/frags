@@ -145,10 +145,14 @@ safe environments.`,
 			if err := c.Bind(&req); err != nil {
 				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 			}
+
 			sm := frags.NewSessionManager()
 			if req.Plan.string != nil {
-				if err := sm.FromYAML([]byte(*req.Plan.string)); err != nil {
-					return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+				var err1, err2 error
+				if sm, err1 = parsePlan("plan.fml", []byte(*req.Plan.string)); err1 != nil {
+					if sm, err2 = parsePlan("plan.yaml", []byte(*req.Plan.string)); err2 != nil {
+						return errors.New(fmt.Sprintf("could not parse plan. FML Parser: %s - YAML Parser: %s", err1.Error(), err2.Error()))
+					}
 				}
 			}
 			if req.Plan.SessionManager != nil {
@@ -236,7 +240,7 @@ carefully and use this mode only in development or safe environments.`,
 			if err := c.Bind(&req); err != nil {
 				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 			}
-			fileRef, err := safePath(c.Param("file") + ".yaml")
+			fileRef, err := safePath(c.Param("file"))
 			if err != nil {
 				return echo.NewHTTPError(http.StatusBadRequest, err.Error())
 			}
@@ -244,8 +248,8 @@ carefully and use this mode only in development or safe environments.`,
 			if err != nil {
 				return err
 			}
-			sm := frags.NewSessionManager()
-			if err := sm.FromYAML(planData); err != nil {
+			sm, err := parsePlan(fileRef, planData)
+			if err != nil {
 				return err
 			}
 			toolsConfig, err := readToolsFile()

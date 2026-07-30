@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"path"
 	"path/filepath"
 	"time"
 
@@ -30,13 +29,9 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
-	fmlCompiler "github.com/theirish81/fml/compiler"
-	fmlParser "github.com/theirish81/fml/parser"
-	"github.com/theirish81/frags"
 	"github.com/theirish81/frags/log"
 	"github.com/theirish81/frags/resources"
 	"github.com/theirish81/frags/util"
-	"gopkg.in/yaml.v3"
 )
 
 var runCmd = &cobra.Command{
@@ -56,24 +51,8 @@ var runCmd = &cobra.Command{
 			cmd.PrintErrln(err)
 			return
 		}
-		if path.Ext(args[0]) == ".fml" {
-			parser, _ := fmlParser.NewParser()
-			parsedFml, err := parser.ParseString(args[0], string(planData))
-			if err != nil {
-				cmd.PrintErrln(err)
-				return
-			}
-			planYaml, err := fmlCompiler.New(parsedFml).Compile()
-			if err != nil {
-				cmd.PrintErrln(err)
-				return
-			}
-			if planData, err = yaml.Marshal(planYaml); err != nil {
-				cmd.PrintErrln(err)
-			}
-		}
-		sm := frags.NewSessionManager()
-		if err := sm.FromYAML(planData); err != nil {
+		sm, err := parsePlan(args[0], planData)
+		if err != nil {
 			cmd.PrintErrln(err)
 			return
 		}

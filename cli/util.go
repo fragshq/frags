@@ -20,11 +20,16 @@ package main
 import (
 	"errors"
 	"fmt"
+	"path/filepath"
 	"reflect"
 	"regexp"
 	"strings"
 
+	fmlCompiler "github.com/theirish81/fml/compiler"
+	fmlParser "github.com/theirish81/fml/parser"
+	"github.com/theirish81/frags"
 	"github.com/theirish81/frags/util"
+	"gopkg.in/yaml.v3"
 )
 
 // sliceToMap converts a slice of strings with the key=value format into a map of strings. If ignoreErrors is true,
@@ -50,4 +55,24 @@ func printDebugAny(res any) {
 	default:
 		fmt.Printf("%v", res)
 	}
+}
+
+func parsePlan(filename string, data []byte) (frags.SessionManager, error) {
+	sm := frags.NewSessionManager()
+	if filepath.Ext(filename) == ".fml" {
+		parser, _ := fmlParser.NewParser()
+		parsedFml, err := parser.ParseString(filename, string(data))
+		if err != nil {
+			return sm, err
+		}
+		planYaml, err := fmlCompiler.New(parsedFml).Compile()
+		if err != nil {
+			return sm, err
+		}
+		if data, err = yaml.Marshal(planYaml); err != nil {
+			return sm, err
+		}
+	}
+	err := sm.FromYAML(data)
+	return sm, err
 }
