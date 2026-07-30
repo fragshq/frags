@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -84,6 +85,12 @@ func (d *Ai) New() frags.Ai {
 // Ask performs a query against the Ollama API, according to the Frags interface
 func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools frags.ToolDefinitions,
 	runner frags.ExportableRunner, rx ...resources.ResourceData) ([]byte, error) {
+	if len(text) == 0 {
+		if sx == nil && len(d.messages) > 0 {
+			return []byte(d.messages[len(d.messages)-1].Content), nil
+		}
+		return nil, fmt.Errorf("no prompt provided but was required")
+	}
 	if len(d.systemPrompt) > 0 && len(d.messages) == 0 {
 		d.messages = append(d.messages, Message{
 			Content: d.systemPrompt,
