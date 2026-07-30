@@ -81,7 +81,7 @@ func (r *Runner) RunAllFunctionCallers(ctx *util.FragsContext, fc FunctionCaller
 		case VarsFunctionCallDestination:
 			outputVars[varName] = value
 		case ContextFunctionCallDestination:
-			if err := util.SetInContext(r.dataStructure, varName, value); err != nil {
+			if err := util.SetInContext(&r.dataStructure, varName, value); err != nil {
 				return nil, err
 			}
 		case DbFunctionCallDestination:
