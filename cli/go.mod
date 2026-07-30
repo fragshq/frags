@@ -4,21 +4,26 @@ go 1.25.4
 
 require (
 	cloud.google.com/go/auth v0.9.3
+	github.com/alecthomas/chroma/v2 v2.27.0
 	github.com/anthropics/anthropic-sdk-go v1.51.0
+	github.com/charmbracelet/bubbles v1.0.0
+	github.com/charmbracelet/bubbletea v1.3.10
+	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/diaphora-ai/apicp v0.0.0-20260531093414-16718d25d8d0
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/google/jsonschema-go v0.4.3
 	github.com/labstack/echo/v4 v4.15.2
+	github.com/mattn/go-isatty v0.0.22
 	github.com/modelcontextprotocol/go-sdk v1.6.0
 	github.com/samber/lo v1.53.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/theirish81/fml v0.1.2
-	github.com/theirish81/frags v1.0.0-rc2
+	github.com/theirish81/frags v1.0.0-rc3
 	github.com/theirish81/frags/anthropic v1.0.0-rc2
 	github.com/theirish81/frags/chatgpt v1.0.0-rc3
 	github.com/theirish81/frags/gemini v1.0.0-rc0
-	github.com/theirish81/frags/ollama v0.25.0
+	github.com/theirish81/frags/ollama v1.0.0-rc0
 	github.com/theirish81/fragsfunctions/data v0.7.0
 	github.com/theirish81/fragsfunctions/fs v0.7.0
 	github.com/theirish81/fragsfunctions/http v0.8.0
@@ -32,17 +37,13 @@ require (
 require (
 	cloud.google.com/go v0.116.0 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
-	github.com/alecthomas/chroma/v2 v2.27.0 // indirect
 	github.com/alecthomas/participle/v2 v2.1.4 // indirect
 	github.com/avast/retry-go/v5 v5.0.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/blues/jsonata-go v1.5.4 // indirect
 	github.com/buger/jsonparser v1.1.2 // indirect
-	github.com/charmbracelet/bubbles v1.0.0 // indirect
-	github.com/charmbracelet/bubbletea v1.3.10 // indirect
 	github.com/charmbracelet/colorprofile v0.4.1 // indirect
-	github.com/charmbracelet/lipgloss v1.1.0 // indirect
 	github.com/charmbracelet/x/ansi v0.11.6 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.15 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
@@ -84,7 +85,6 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
-	github.com/mattn/go-isatty v0.0.22 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.19 // indirect
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
