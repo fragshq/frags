@@ -24,8 +24,8 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/diaphora-ai/apicp"
-	apiCpCollection "github.com/diaphora-ai/apicp/collection"
+	"github.com/theirish81/apicp"
+	apiCpCollection "github.com/theirish81/apicp/collection"
 	"github.com/theirish81/frags"
 	"github.com/theirish81/frags/log"
 	"github.com/theirish81/frags/mcpauth"
