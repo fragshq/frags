@@ -20,7 +20,6 @@ package mcpauth
 import (
 	"context"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -311,8 +310,6 @@ func (p *OAuthProvider) Token() (TokenResult, error) {
 			tr := TokenResult{}
 			return *tr.FromOauth2Token(t), nil
 		} else {
-			data, _ := io.ReadAll(err.(*oauth2.RetrieveError).Response.Body)
-			fmt.Println(string(data))
 			return TokenResult{}, err
 		}
 	}
