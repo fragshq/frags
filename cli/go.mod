@@ -9,7 +9,6 @@ require (
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/diaphora-ai/apicp v0.0.0-20260531093414-16718d25d8d0
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/google/jsonschema-go v0.4.3
 	github.com/labstack/echo/v4 v4.15.2
@@ -18,6 +17,7 @@ require (
 	github.com/samber/lo v1.53.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
+	github.com/theirish81/apicp v0.0.0-20260731045705-0784f392fbcb
 	github.com/theirish81/fml v0.1.2
 	github.com/theirish81/frags v1.0.0-rc3
 	github.com/theirish81/frags/anthropic v1.0.0-rc2

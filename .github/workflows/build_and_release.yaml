@@ -11,8 +11,8 @@ jobs:
     permissions:
       contents: write
     env:
-      GOPRIVATE: "github.com/diaphora-ai/*,github.com/theirish81/*"
-      GONOSUMDB: "github.com/diaphora-ai/*,github.com/theirish81/*"
+      GOPRIVATE: "*github.com/theirish81/*"
+      GONOSUMDB: "github.com/theirish81/*"
       GOFLAGS: "-mod=mod"
     steps:
       - uses: actions/checkout@v3
