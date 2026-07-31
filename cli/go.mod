@@ -19,7 +19,7 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/theirish81/apicp v0.0.0-20260731045705-0784f392fbcb
 	github.com/theirish81/fml v0.1.2
-	github.com/theirish81/frags v1.0.0-rc3
+	github.com/theirish81/frags v1.0.0-rc4
 	github.com/theirish81/frags/anthropic v1.0.0-rc2
 	github.com/theirish81/frags/chatgpt v1.0.0-rc3
 	github.com/theirish81/frags/gemini v1.0.0-rc0
