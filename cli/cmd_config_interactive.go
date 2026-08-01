@@ -82,12 +82,37 @@ type interactiveModel struct {
 	envLines []EnvLine
 	values   map[string]string // KEY -> VALUE
 
-	listCursor int
-	listScroll int
-	input      textinput.Model
+	listCursor    int
+	listScroll    int
+	input         textinput.Model
+	enumCursor    int
+	editingCustom bool
 
 	saved bool
 	err   error
+}
+
+func (m *interactiveModel) getEnumOptions(sk configKey) []string {
+	if sk.envKey == "AI_ENGINE" {
+		return []string{"anthropic", "chatgpt", "gemini", "ollama"}
+	}
+	if sk.envKey == "MODEL" {
+		engine := strings.ToLower(m.values["AI_ENGINE"])
+		var opts []string
+		switch engine {
+		case "gemini":
+			opts = []string{"gemini-3.1-pro-preview", "gemini-3.5-flash-lite", "gemini-3.5-flash"}
+		case "anthropic":
+			opts = []string{"claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"}
+		case "chatgpt":
+			opts = []string{"gpt-4o-mini", "gpt-4o"}
+		}
+		if len(opts) > 0 {
+			opts = append(opts, "Custom (type manually)...")
+			return opts
+		}
+	}
+	return nil
 }
 
 func parseEnvFile(path string) ([]EnvLine, error) {
@@ -254,9 +279,22 @@ func (m interactiveModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			case "enter":
 				m.state = stateEditValue
+				m.editingCustom = false
 				sk := standardKeys[m.listCursor]
-				m.input.SetValue(m.values[sk.envKey])
-				m.input.Focus()
+				opts := m.getEnumOptions(sk)
+				if len(opts) > 0 {
+					currentVal := m.values[sk.envKey]
+					m.enumCursor = 0
+					for idx, opt := range opts {
+						if opt == currentVal {
+							m.enumCursor = idx
+							break
+						}
+					}
+				} else {
+					m.input.SetValue(m.values[sk.envKey])
+					m.input.Focus()
+				}
 			case "u":
 				// Unset/remove the selected key
 				sk := standardKeys[m.listCursor]
@@ -282,35 +320,81 @@ func (m interactiveModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 
 		case stateEditValue:
-			switch msg.String() {
-			case "enter":
-				sk := standardKeys[m.listCursor]
-				newVal := m.input.Value()
-				m.values[sk.envKey] = newVal
-
-				// Update or append in envLines
-				found := false
-				for i, el := range m.envLines {
-					if el.Key == sk.envKey {
-						m.envLines[i].Value = newVal
-						found = true
-						break
+			sk := standardKeys[m.listCursor]
+			opts := m.getEnumOptions(sk)
+			if len(opts) > 0 && !m.editingCustom {
+				switch msg.String() {
+				case "up", "k":
+					if m.enumCursor > 0 {
+						m.enumCursor--
 					}
-				}
-				if !found {
-					m.envLines = append(m.envLines, EnvLine{
-						Key:   sk.envKey,
-						Value: newVal,
-					})
-				}
+				case "down", "j":
+					if m.enumCursor < len(opts)-1 {
+						m.enumCursor++
+					}
+				case "enter":
+					selected := opts[m.enumCursor]
+					if selected == "Custom (type manually)..." {
+						m.editingCustom = true
+						m.input.SetValue(m.values[sk.envKey])
+						m.input.Focus()
+					} else {
+						newVal := selected
+						m.values[sk.envKey] = newVal
 
-				m.state = stateListKeys
-			case "esc":
-				m.state = stateListKeys
-			default:
-				var cmd tea.Cmd
-				m.input, cmd = m.input.Update(msg)
-				return m, cmd
+						found := false
+						for i, el := range m.envLines {
+							if el.Key == sk.envKey {
+								m.envLines[i].Value = newVal
+								found = true
+								break
+							}
+						}
+						if !found {
+							m.envLines = append(m.envLines, EnvLine{
+								Key:   sk.envKey,
+								Value: newVal,
+							})
+						}
+						m.state = stateListKeys
+					}
+				case "esc":
+					m.state = stateListKeys
+				}
+			} else {
+				switch msg.String() {
+				case "enter":
+					newVal := m.input.Value()
+					m.values[sk.envKey] = newVal
+
+					// Update or append in envLines
+					found := false
+					for i, el := range m.envLines {
+						if el.Key == sk.envKey {
+							m.envLines[i].Value = newVal
+							found = true
+							break
+						}
+					}
+					if !found {
+						m.envLines = append(m.envLines, EnvLine{
+							Key:   sk.envKey,
+							Value: newVal,
+						})
+					}
+
+					m.state = stateListKeys
+				case "esc":
+					if len(opts) > 0 {
+						m.editingCustom = false
+					} else {
+						m.state = stateListKeys
+					}
+				default:
+					var cmd tea.Cmd
+					m.input, cmd = m.input.Update(msg)
+					return m, cmd
+				}
 			}
 		}
 	}
@@ -422,9 +506,28 @@ func (m interactiveModel) View() string {
 		s.WriteString(fmt.Sprintf("  Editing: %s\n\n", lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF007F")).Render(activeKey.envKey)))
 		s.WriteString(fmt.Sprintf("  %s\n\n", lipgloss.NewStyle().Foreground(lipgloss.Color("#BCBCBC")).Render(activeKey.description)))
 
-		s.WriteString("  Value:\n")
-		s.WriteString("  " + m.input.View() + "\n\n")
-		s.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#767676")).Render("  (Enter to confirm, Esc to cancel)") + "\n")
+		opts := m.getEnumOptions(activeKey)
+		if len(opts) > 0 && !m.editingCustom {
+			s.WriteString("  Choose an option:\n\n")
+			for idx, opt := range opts {
+				cursor := "  "
+				optStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#BCBCBC"))
+				if idx == m.enumCursor {
+					cursor = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF007F")).Render("> ")
+					if opt == "Custom (type manually)..." {
+						optStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFAF00"))
+					} else {
+						optStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FF87"))
+					}
+				}
+				s.WriteString(fmt.Sprintf("%s%s\n", cursor, optStyle.Render(opt)))
+			}
+			s.WriteString("\n" + lipgloss.NewStyle().Foreground(lipgloss.Color("#767676")).Render("  (Use Up/Down arrows, Enter to select, Esc to cancel)") + "\n")
+		} else {
+			s.WriteString("  Value:\n")
+			s.WriteString("  " + m.input.View() + "\n\n")
+			s.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#767676")).Render("  (Enter to confirm, Esc to cancel)") + "\n")
+		}
 	}
 
 	return s.String()
