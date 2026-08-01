@@ -18,6 +18,10 @@
 package main
 
 import (
+	"fmt"
+	"os"
+	"strings"
+
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -113,3 +117,61 @@ var (
 	StyleFooterError   = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF3333"))
 	StyleFooterSuccess = lipgloss.NewStyle().Bold(true).Foreground(ColorGreen)
 )
+
+// Reusable Procedural UI Components
+
+// UpdateFileSelection handles standard file chooser arrow navigation and confirm/quit keyboard input.
+func UpdateFileSelection(key string, cursor *int, options []fileOption) (path string, completed bool, quit bool) {
+	switch key {
+	case "up", "k":
+		if *cursor > 0 {
+			*cursor--
+		}
+	case "down", "j":
+		if *cursor < len(options)-1 {
+			*cursor++
+		}
+	case "enter":
+		return options[*cursor].path, true, false
+	case "q", "esc":
+		return "", false, true
+	}
+	return "", false, false
+}
+
+// RenderFileSelection renders a standard interactive list of files to select.
+func RenderFileSelection(title string, cursor int, options []fileOption) string {
+	var s strings.Builder
+	s.WriteString("  " + title + "\n\n")
+	for i, opt := range options {
+		indicator := "  "
+		labelStyle := StyleLabelDefault
+		if i == cursor {
+			indicator = StyleCursor.Render("> ")
+			labelStyle = StyleLabelActive
+		}
+
+		existsStr := StyleExists.Render("(exists)")
+		if _, err := os.Stat(opt.path); os.IsNotExist(err) {
+			existsStr = StyleWillCreate.Render("(will create)")
+		}
+
+		s.WriteString(fmt.Sprintf("%s%s %s\n", indicator, labelStyle.Render(opt.label), existsStr))
+		s.WriteString(fmt.Sprintf("    %s\n\n", StyleMuted.Render(opt.path)))
+	}
+	s.WriteString(StyleHelp.Render("  (Use Up/Down arrows, Enter to select, q/esc to quit)") + "\n")
+	return s.String()
+}
+
+// RenderTextInputField renders a uniform interface for editing a single value via textinput.
+func RenderTextInputField(contextHeader, fieldLabel string, inputView string) string {
+	var s strings.Builder
+	if contextHeader != "" {
+		s.WriteString(fmt.Sprintf("  %s\n", contextHeader))
+	}
+	s.WriteString(fmt.Sprintf("  Editing: %s\n\n", StyleLabelActive.Render(fieldLabel)))
+	s.WriteString("  Enter new value:\n\n")
+	s.WriteString("  " + inputView + "\n\n")
+	s.WriteString(StyleHelp.Render("  (Press Enter to save, Esc to cancel)") + "\n")
+	return s.String()
+}

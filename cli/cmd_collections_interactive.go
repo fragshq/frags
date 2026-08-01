@@ -179,24 +179,17 @@ func (m interactiveCollectionsModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch m.state {
 		case stateCollChooseFile:
-			switch msg.String() {
-			case "up", "k":
-				if m.fileCursor > 0 {
-					m.fileCursor--
-				}
-			case "down", "j":
-				if m.fileCursor < len(m.fileOptions)-1 {
-					m.fileCursor++
-				}
-			case "enter":
-				m.filePath = m.fileOptions[m.fileCursor].path
+			path, completed, quit := UpdateFileSelection(msg.String(), &m.fileCursor, m.fileOptions)
+			if quit {
+				return m, tea.Quit
+			}
+			if completed {
+				m.filePath = path
 				m.loadConfig()
 				if m.err != nil {
 					return m, tea.Quit
 				}
 				m.state = stateCollListCollections
-			case "q", "esc":
-				return m, tea.Quit
 			}
 
 		case stateCollListCollections:
@@ -467,24 +460,7 @@ func (m interactiveCollectionsModel) View() string {
 
 	switch m.state {
 	case stateCollChooseFile:
-		s.WriteString("  Select which tools configuration file to edit:\n\n")
-		for i, opt := range m.fileOptions {
-			cursor := "  "
-			labelStyle := StyleLabelDefault
-			if i == m.fileCursor {
-				cursor = StyleCursor.Render("> ")
-				labelStyle = StyleLabelActive
-			}
-
-			existsStr := StyleExists.Render("(exists)")
-			if _, err := os.Stat(opt.path); os.IsNotExist(err) {
-				existsStr = StyleWillCreate.Render("(will create)")
-			}
-
-			s.WriteString(fmt.Sprintf("%s%s %s\n", cursor, labelStyle.Render(opt.label), existsStr))
-			s.WriteString(fmt.Sprintf("    %s\n\n", StyleMuted.Render(opt.path)))
-		}
-		s.WriteString(StyleHelp.Render("  (Use Up/Down arrows, Enter to select, q/esc to quit)") + "\n")
+		s.WriteString(RenderFileSelection("Select which tools configuration file to edit:", m.fileCursor, m.fileOptions))
 
 	case stateCollListCollections:
 		s.WriteString(fmt.Sprintf("  File: %s\n\n", StyleValActive.Render(m.filePath)))
@@ -601,13 +577,11 @@ func (m interactiveCollectionsModel) View() string {
 
 	case stateCollEditFieldValue:
 		activeField := collFields[m.fieldCursor]
-		s.WriteString(fmt.Sprintf("  Collection: %s\n", StyleExists.Render(m.activeColl)))
-		s.WriteString(fmt.Sprintf("  Editing: %s\n\n", StyleLabelActive.Render(activeField.label)))
-
-		s.WriteString("  Enter new value:\n\n")
-		s.WriteString("  " + m.input.View() + "\n\n")
-
-		s.WriteString(StyleHelp.Render("  (Press Enter to save, Esc to cancel)") + "\n")
+		s.WriteString(RenderTextInputField(
+			fmt.Sprintf("Collection: %s", StyleExists.Render(m.activeColl)),
+			activeField.label,
+			m.input.View(),
+		))
 
 	case stateCollListParams:
 		s.WriteString(fmt.Sprintf("  Collection: %s\n\n", StyleExists.Render(m.activeColl)))
@@ -643,24 +617,25 @@ func (m interactiveCollectionsModel) View() string {
 		s.WriteString(StyleHelp.Render("  [a] Add Param  |  [d] Delete  |  [r] Rename Key  |  [enter] Edit Value  |  [esc/q] Go Back") + "\n")
 
 	case stateCollAddParamKey:
-		s.WriteString(fmt.Sprintf("  Collection: %s\n\n", StyleExists.Render(m.activeColl)))
-		s.WriteString("  Add Parameter Key:\n\n")
-		s.WriteString("  " + m.input.View() + "\n\n")
-		s.WriteString(StyleHelp.Render("  (Press Enter to create, Esc to cancel)") + "\n")
+		s.WriteString(RenderTextInputField(
+			fmt.Sprintf("Collection: %s", StyleExists.Render(m.activeColl)),
+			"Add Parameter Key",
+			m.input.View(),
+		))
 
 	case stateCollRenameParamKey:
-		s.WriteString(fmt.Sprintf("  Collection: %s\n", StyleExists.Render(m.activeColl)))
-		s.WriteString(fmt.Sprintf("  Renaming Parameter Key: %s\n\n", StyleLabelActive.Render(m.activeParam)))
-		s.WriteString("  Enter new key name:\n\n")
-		s.WriteString("  " + m.input.View() + "\n\n")
-		s.WriteString(StyleHelp.Render("  (Press Enter to rename, Esc to cancel)") + "\n")
+		s.WriteString(RenderTextInputField(
+			fmt.Sprintf("Collection: %s\n  Renaming Parameter Key: %s", StyleExists.Render(m.activeColl), StyleLabelActive.Render(m.activeParam)),
+			"New Key Name",
+			m.input.View(),
+		))
 
 	case stateCollEditParamValue:
-		s.WriteString(fmt.Sprintf("  Collection: %s\n", StyleExists.Render(m.activeColl)))
-		s.WriteString(fmt.Sprintf("  Editing Parameter: %s\n\n", StyleLabelActive.Render(m.activeParam)))
-		s.WriteString("  Enter value:\n\n")
-		s.WriteString("  " + m.input.View() + "\n\n")
-		s.WriteString(StyleHelp.Render("  (Press Enter to save, Esc to cancel)") + "\n")
+		s.WriteString(RenderTextInputField(
+			fmt.Sprintf("Collection: %s", StyleExists.Render(m.activeColl)),
+			fmt.Sprintf("Parameter Value (%s)", m.activeParam),
+			m.input.View(),
+		))
 	}
 
 	return s.String()

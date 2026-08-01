@@ -245,17 +245,12 @@ func (m interactiveModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		switch m.state {
 		case stateChooseFile:
-			switch msg.String() {
-			case "up", "k":
-				if m.fileCursor > 0 {
-					m.fileCursor--
-				}
-			case "down", "j":
-				if m.fileCursor < len(m.fileOptions)-1 {
-					m.fileCursor++
-				}
-			case "enter":
-				m.filePath = m.fileOptions[m.fileCursor].path
+			path, completed, quit := UpdateFileSelection(msg.String(), &m.fileCursor, m.fileOptions)
+			if quit {
+				return m, tea.Quit
+			}
+			if completed {
+				m.filePath = path
 				// Load file if exists, else load empty default lines
 				lines, err := parseEnvFile(m.filePath)
 				if err != nil {
@@ -285,8 +280,6 @@ func (m interactiveModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.state = stateListKeys
 				m.listCursor = 0
 				m.listScroll = 0
-			case "q", "esc":
-				return m, tea.Quit
 			}
 
 		case stateListKeys:
@@ -437,25 +430,7 @@ func (m interactiveModel) View() string {
 
 	switch m.state {
 	case stateChooseFile:
-		s.WriteString("  Select which configuration file to edit:\n\n")
-		for i, opt := range m.fileOptions {
-			cursor := "  "
-			labelStyle := StyleLabelDefault
-			if i == m.fileCursor {
-				cursor = StyleCursor.Render("> ")
-				labelStyle = StyleLabelActive
-			}
-
-			// check if file exists
-			existsStr := StyleExists.Render("(exists)")
-			if _, err := os.Stat(opt.path); os.IsNotExist(err) {
-				existsStr = StyleWillCreate.Render("(will create)")
-			}
-
-			s.WriteString(fmt.Sprintf("%s%s %s\n", cursor, labelStyle.Render(opt.label), existsStr))
-			s.WriteString(fmt.Sprintf("    %s\n\n", StyleMuted.Render(opt.path)))
-		}
-		s.WriteString(StyleHelp.Render("  (Use Up/Down arrows, Enter to select, q/esc to quit)") + "\n")
+		s.WriteString(RenderFileSelection("Select which configuration file to edit:", m.fileCursor, m.fileOptions))
 
 	case stateListKeys:
 		s.WriteString(fmt.Sprintf("  File: %s\n\n", StyleValActive.Render(m.filePath)))
@@ -539,9 +514,7 @@ func (m interactiveModel) View() string {
 			}
 			s.WriteString("\n" + StyleHelp.Render("  (Use Up/Down arrows, Enter to select, Esc to cancel)") + "\n")
 		} else {
-			s.WriteString("  Value:\n")
-			s.WriteString("  " + m.input.View() + "\n\n")
-			s.WriteString(StyleHelp.Render("  (Enter to confirm, Esc to cancel)") + "\n")
+			s.WriteString(RenderTextInputField("", "Value", m.input.View()))
 		}
 	}
 
