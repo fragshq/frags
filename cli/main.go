@@ -22,9 +22,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
-	"github.com/theirish81/frags/gemini"
 )
 
 // resolveConfigPath finds the first existing configuration file.
@@ -76,31 +74,10 @@ func main() {
 	viper.AutomaticEnv()
 
 	if !exists {
-		// Ensure parent directory exists for the configuration file (e.g. ~/.config/frags/)
-		configDir := filepath.Dir(configPath)
-		if err := os.MkdirAll(configDir, 0755); err != nil {
-			panic(fmt.Sprintf("failed to create config directory: %v", err))
+		fmt.Println("No configuration file found. Starting interactive configuration editor...")
+		if err := runInteractiveConfig(""); err != nil {
+			fmt.Printf("Error starting config editor: %v\n", err)
 		}
-
-		data := make(map[string]any)
-		defCfg := gemini.DefaultConfig()
-		cfg.AiEngine = "gemini"
-		cfg.GeminiLocation = "global"
-		cfg.Model = defCfg.Model
-		cfg.TopK = defCfg.TopK
-		cfg.TopP = defCfg.TopP
-		cfg.Temperature = defCfg.Temperature
-		cfg.OllamaBaseURL = "http://localhost:11434"
-		cfg.ParallelWorkers = 1
-		cfg.NumPredict = 1024
-		cfg.ChatGptBaseURL = "https://api.openai.com/v1"
-		_ = mapstructure.Decode(&cfg, &data)
-		_ = viper.MergeConfigMap(data)
-		viper.SetConfigType("env")
-		_ = viper.WriteConfigAs(configPath)
-
-		fmt.Printf("A default configuration file was created at: %s\nPlease fill it out and try again.\n", configPath)
-		_ = rootCmd.Help()
 		return
 	}
 

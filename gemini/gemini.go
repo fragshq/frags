@@ -46,7 +46,7 @@ const topP float32 = 0.9
 
 const jsonContentType = "application/json"
 const textContentType = "text/plain"
-const defaultModel = "gemini-2.5-flash"
+const defaultModel = "gemini-3.1-flash-lite"
 
 // Ai is a wrapper around the genai client for Frags
 type Ai struct {

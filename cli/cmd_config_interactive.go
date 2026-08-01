@@ -25,7 +25,6 @@ import (
 
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 type editState int
@@ -66,11 +65,6 @@ type EnvLine struct {
 	Raw   string
 	Key   string
 	Value string
-}
-
-type fileOption struct {
-	label string
-	path  string
 }
 
 type interactiveModel struct {
@@ -176,7 +170,7 @@ func createDefaultEnvLines() []EnvLine {
 	return lines
 }
 
-func newInteractiveModel() interactiveModel {
+func newInteractiveModel(preselectedPath string) interactiveModel {
 	var fileOpts []fileOption
 	fileOpts = append(fileOpts, fileOption{
 		label: "Current Directory (.env)",
@@ -195,12 +189,46 @@ func newInteractiveModel() interactiveModel {
 	ti.CharLimit = 150
 	ti.Width = 40
 
-	return interactiveModel{
+	m := interactiveModel{
 		state:       stateChooseFile,
 		fileOptions: fileOpts,
 		input:       ti,
 		values:      make(map[string]string),
 	}
+
+	if preselectedPath != "" {
+		m.filePath = preselectedPath
+		lines, err := parseEnvFile(preselectedPath)
+		if err != nil {
+			if os.IsNotExist(err) {
+				m.envLines = createDefaultEnvLines()
+			} else {
+				m.err = err
+				return m
+			}
+		} else {
+			m.envLines = lines
+		}
+
+		// Populate values map
+		for _, el := range m.envLines {
+			if el.Key != "" {
+				m.values[el.Key] = el.Value
+			}
+		}
+		// Also populate standard keys with empty if they aren't in the file yet
+		for _, sk := range standardKeys {
+			if _, ok := m.values[sk.envKey]; !ok {
+				m.values[sk.envKey] = ""
+			}
+		}
+
+		m.state = stateListKeys
+		m.listCursor = 0
+		m.listScroll = 0
+	}
+
+	return m
 }
 
 func (m interactiveModel) Init() tea.Cmd {
@@ -405,39 +433,32 @@ func (m interactiveModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m interactiveModel) View() string {
 	var s strings.Builder
 
-	headerStyle := lipgloss.NewStyle().
-		Bold(true).
-		Foreground(lipgloss.Color("#FAFAFA")).
-		Background(lipgloss.Color("#7D56F4")).
-		Padding(0, 2).
-		MarginBottom(1)
-
-	s.WriteString("\n" + headerStyle.Render("⚡ FRAGS CONFIG EDITOR ⚡") + "\n\n")
+	s.WriteString("\n" + StyleHeader.Render("⚡ FRAGS CONFIG EDITOR ⚡") + "\n\n")
 
 	switch m.state {
 	case stateChooseFile:
 		s.WriteString("  Select which configuration file to edit:\n\n")
 		for i, opt := range m.fileOptions {
 			cursor := "  "
-			labelStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#BCBCBC"))
+			labelStyle := StyleLabelDefault
 			if i == m.fileCursor {
-				cursor = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF007F")).Render("> ")
-				labelStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF007F"))
+				cursor = StyleCursor.Render("> ")
+				labelStyle = StyleLabelActive
 			}
 
 			// check if file exists
-			existsStr := lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF87")).Render("(exists)")
+			existsStr := StyleExists.Render("(exists)")
 			if _, err := os.Stat(opt.path); os.IsNotExist(err) {
-				existsStr = lipgloss.NewStyle().Foreground(lipgloss.Color("#8A8A8A")).Render("(will create)")
+				existsStr = StyleWillCreate.Render("(will create)")
 			}
 
 			s.WriteString(fmt.Sprintf("%s%s %s\n", cursor, labelStyle.Render(opt.label), existsStr))
-			s.WriteString(fmt.Sprintf("    %s\n\n", lipgloss.NewStyle().Foreground(lipgloss.Color("#585858")).Render(opt.path)))
+			s.WriteString(fmt.Sprintf("    %s\n\n", StyleMuted.Render(opt.path)))
 		}
-		s.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#767676")).Render("  (Use Up/Down arrows, Enter to select, q/esc to quit)") + "\n")
+		s.WriteString(StyleHelp.Render("  (Use Up/Down arrows, Enter to select, q/esc to quit)") + "\n")
 
 	case stateListKeys:
-		s.WriteString(fmt.Sprintf("  File: %s\n\n", lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FF87")).Render(m.filePath)))
+		s.WriteString(fmt.Sprintf("  File: %s\n\n", StyleValActive.Render(m.filePath)))
 		s.WriteString("  Select a configuration key to edit:\n\n")
 
 		limit := m.listScroll + 10
@@ -448,18 +469,18 @@ func (m interactiveModel) View() string {
 		for i := m.listScroll; i < limit; i++ {
 			sk := standardKeys[i]
 			cursor := "  "
-			keyStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#BCBCBC"))
-			valStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#00AFFF"))
+			keyStyle := StyleLabelDefault
+			valStyle := StyleValDefault
 
 			if i == m.listCursor {
-				cursor = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF007F")).Render("> ")
-				keyStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF007F"))
-				valStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FF87"))
+				cursor = StyleCursor.Render("> ")
+				keyStyle = StyleLabelActive
+				valStyle = StyleValActive
 			}
 
 			val := m.values[sk.envKey]
 			if val == "" {
-				val = lipgloss.NewStyle().Foreground(lipgloss.Color("#585858")).Render("<not set>")
+				val = StyleMuted.Render("<not set>")
 			} else {
 				val = fmt.Sprintf(`"%s"`, val)
 			}
@@ -480,61 +501,55 @@ func (m interactiveModel) View() string {
 			scrollText += "↓ (more keys below)"
 		}
 		if scrollText != "" {
-			s.WriteString("\n" + lipgloss.NewStyle().Foreground(lipgloss.Color("#585858")).Render(scrollText) + "\n")
+			s.WriteString("\n" + StyleMuted.Render(scrollText) + "\n")
 		}
 
 		// Active key description box
 		activeKey := standardKeys[m.listCursor]
-		descStyle := lipgloss.NewStyle().
-			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("#7D56F4")).
-			Padding(0, 1).
-			Width(65).
-			MarginTop(1)
 
-		s.WriteString("\n" + descStyle.Render(
+		s.WriteString("\n" + StyleDescBox.Render(
 			fmt.Sprintf("%s\n%s",
-				lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#7D56F4")).Render(activeKey.label),
-				lipgloss.NewStyle().Foreground(lipgloss.Color("#BCBCBC")).Render(activeKey.description),
+				StyleDescTitle.Render(activeKey.label),
+				StyleDescText.Render(activeKey.description),
 			),
 		) + "\n")
 
-		s.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#767676")).Render("\n  ↑/↓: Navigate | Enter: Edit | u: Unset | s: Save & Exit | q/esc: Go Back") + "\n")
+		s.WriteString(StyleHelp.Render("\n  ↑/↓: Navigate | Enter: Edit | u: Unset | s: Save & Exit | q/esc: Go Back") + "\n")
 
 	case stateEditValue:
 		activeKey := standardKeys[m.listCursor]
-		s.WriteString(fmt.Sprintf("  Editing: %s\n\n", lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FF007F")).Render(activeKey.envKey)))
-		s.WriteString(fmt.Sprintf("  %s\n\n", lipgloss.NewStyle().Foreground(lipgloss.Color("#BCBCBC")).Render(activeKey.description)))
+		s.WriteString(fmt.Sprintf("  Editing: %s\n\n", StyleLabelActive.Render(activeKey.envKey)))
+		s.WriteString(fmt.Sprintf("  %s\n\n", StyleLabelDefault.Render(activeKey.description)))
 
 		opts := m.getEnumOptions(activeKey)
 		if len(opts) > 0 && !m.editingCustom {
 			s.WriteString("  Choose an option:\n\n")
 			for idx, opt := range opts {
 				cursor := "  "
-				optStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("#BCBCBC"))
+				optStyle := StyleLabelDefault
 				if idx == m.enumCursor {
-					cursor = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF007F")).Render("> ")
+					cursor = StyleCursor.Render("> ")
 					if opt == "Custom (type manually)..." {
-						optStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#FFAF00"))
+						optStyle = StyleOptCustom
 					} else {
-						optStyle = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.Color("#00FF87"))
+						optStyle = StyleValActive
 					}
 				}
 				s.WriteString(fmt.Sprintf("%s%s\n", cursor, optStyle.Render(opt)))
 			}
-			s.WriteString("\n" + lipgloss.NewStyle().Foreground(lipgloss.Color("#767676")).Render("  (Use Up/Down arrows, Enter to select, Esc to cancel)") + "\n")
+			s.WriteString("\n" + StyleHelp.Render("  (Use Up/Down arrows, Enter to select, Esc to cancel)") + "\n")
 		} else {
 			s.WriteString("  Value:\n")
 			s.WriteString("  " + m.input.View() + "\n\n")
-			s.WriteString(lipgloss.NewStyle().Foreground(lipgloss.Color("#767676")).Render("  (Enter to confirm, Esc to cancel)") + "\n")
+			s.WriteString(StyleHelp.Render("  (Enter to confirm, Esc to cancel)") + "\n")
 		}
 	}
 
 	return s.String()
 }
 
-func runInteractiveConfig() error {
-	m := newInteractiveModel()
+func runInteractiveConfig(preselectedPath string) error {
+	m := newInteractiveModel(preselectedPath)
 	p := tea.NewProgram(m, tea.WithOutput(os.Stderr))
 	finalModel, err := p.Run()
 	if err != nil {

@@ -71,7 +71,7 @@ var configEditCmd = &cobra.Command{
 	Short: "Edit the configuration interactively",
 	Long:  `Launches a terminal UI to view and edit configuration keys for project or global environments.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := runInteractiveConfig(); err != nil {
+		if err := runInteractiveConfig(""); err != nil {
 			cmd.PrintErrln("Error:", err)
 		}
 	},

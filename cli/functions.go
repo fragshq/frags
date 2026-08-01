@@ -23,6 +23,7 @@ import (
 	"errors"
 	"log/slog"
 	"os"
+	"path/filepath"
 
 	"github.com/theirish81/apicp"
 	apiCpCollection "github.com/theirish81/apicp/collection"
@@ -34,6 +35,52 @@ import (
 	"github.com/theirish81/fragsfunctions/postgres"
 	"github.com/theirish81/sesat2"
 )
+
+var (
+	toolsPath     string
+	tokensPath    string
+	pathsResolved bool
+)
+
+func resolvePaths() {
+	if pathsResolved {
+		return
+	}
+	// Check current directory first
+	cwdTools := "tools.json"
+	if _, err := os.Stat(cwdTools); err == nil {
+		toolsPath = cwdTools
+		tokensPath = "tokens.json"
+		pathsResolved = true
+		return
+	}
+
+	// Check user's config directory (cross platform)
+	if uConfigDir, err := os.UserConfigDir(); err == nil {
+		userTools := filepath.Join(uConfigDir, "frags", "tools.json")
+		if _, err := os.Stat(userTools); err == nil {
+			toolsPath = userTools
+			tokensPath = filepath.Join(uConfigDir, "frags", "tokens.json")
+			pathsResolved = true
+			return
+		}
+	}
+
+	// Default to current directory
+	toolsPath = cwdTools
+	tokensPath = "tokens.json"
+	pathsResolved = true
+}
+
+func getToolsPath() string {
+	resolvePaths()
+	return toolsPath
+}
+
+func getTokensPath() string {
+	resolvePaths()
+	return tokensPath
+}
 
 type ExtendedToolsConfig struct {
 	frags.ToolsConfig `json:",inline"`
@@ -47,7 +94,7 @@ type ApiCPConfig struct {
 
 // readToolsFile reads the tools configuration file and returns the parsed configuration
 func readToolsFile() (ExtendedToolsConfig, error) {
-	data, err := os.ReadFile("tools.json")
+	data, err := os.ReadFile(getToolsPath())
 	if errors.Is(err, os.ErrNotExist) {
 		data = []byte("{}")
 	} else if err != nil {
@@ -74,7 +121,7 @@ func connectMcpAndCollections(ctx context.Context, toolsConfig ExtendedToolsConf
 	if cfg.OauthDisabled {
 		mcpTools.WithOAuthProvider(mcpauth.NewEmptyOauthProvider(true).WithCache(mcpauth.NewInMemoryCache()))
 	} else {
-		oauthCache, err := mcpauth.NewFsOauthCache("./tokens.json")
+		oauthCache, err := mcpauth.NewFsOauthCache(getTokensPath())
 		if err != nil {
 			return mcpTools, toolCollections, toolDefinitions, functions, err
 		}
