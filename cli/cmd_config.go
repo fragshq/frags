@@ -28,10 +28,14 @@ import (
 
 var configCmd = &cobra.Command{
 	Use:   "config",
+	Short: "Manage the configuration",
+	Long:  `Manage the configuration. Use "view" to print the current configuration or "edit" to edit it interactively.`,
+}
+
+var configViewCmd = &cobra.Command{
+	Use:   "view",
 	Short: "Print the current configuration",
-	Long: `
-Prints the current configuration. It will additionally connect to the available MCP tools and print their function
-setup.`,
+	Long:  `Prints the current configuration. It will additionally connect to the available MCP tools and print their function setup if --show-tools is specified.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		globalConfig, _ := yaml.Marshal(cfg)
 		fmt.Println("==== GLOBAL CONFIG ====")
@@ -59,10 +63,23 @@ setup.`,
 			fmt.Println("==== FUNCTIONS CONFIG ====")
 			fmt.Println(string(functionsText))
 		}
+	},
+}
 
+var configEditCmd = &cobra.Command{
+	Use:   "edit",
+	Short: "Edit the configuration interactively",
+	Long:  `Launches a terminal UI to view and edit configuration keys for project or global environments.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := runInteractiveConfig(); err != nil {
+			cmd.PrintErrln("Error:", err)
+		}
 	},
 }
 
 func init() {
-	configCmd.Flags().BoolVarP(&tools, "show-tools", "", false, "Show tools")
+	configCmd.AddCommand(configViewCmd)
+	configCmd.AddCommand(configEditCmd)
+
+	configViewCmd.Flags().BoolVarP(&tools, "show-tools", "", false, "Show tools")
 }
