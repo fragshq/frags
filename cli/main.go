@@ -19,36 +19,72 @@ package main
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
-	"github.com/go-viper/mapstructure/v2"
 	"github.com/spf13/viper"
-	"github.com/theirish81/frags/gemini"
 )
 
+// resolveConfigPath finds the first existing configuration file.
+// If none are found, it returns the path where the configuration file should be created.
+func resolveConfigPath() (string, bool) {
+	// 1. Check environment variable override
+	if envPath := os.Getenv("FRAGS_CONFIG"); envPath != "" {
+		if _, err := os.Stat(envPath); err == nil {
+			return envPath, true
+		}
+	}
+
+	// 2. Check current working directory
+	cwdPath := ".env"
+	if _, err := os.Stat(cwdPath); err == nil {
+		return cwdPath, true
+	}
+
+	// 3. Check standard User Config Directory
+	var userConfigPath string
+	if uConfigDir, err := os.UserConfigDir(); err == nil {
+		userConfigPath = filepath.Join(uConfigDir, "frags", ".env")
+		if _, err := os.Stat(userConfigPath); err == nil {
+			return userConfigPath, true
+		}
+	}
+
+	// 4. Check Application Executable Directory
+	var exeConfigPath string
+	if exePath, err := os.Executable(); err == nil {
+		exeConfigPath = filepath.Join(filepath.Dir(exePath), ".env")
+		if _, err := os.Stat(exeConfigPath); err == nil {
+			return exeConfigPath, true
+		}
+	}
+
+	// 5. If none exist, return the default location to write a new one:
+	// User Configuration Directory to prevent current directory pollution.
+	if uConfigDir, err := os.UserConfigDir(); err == nil {
+		return filepath.Join(uConfigDir, "frags", ".env"), false
+	}
+	return cwdPath, false
+}
+
 func main() {
-	viper.SetConfigFile(".env")
+	configPath, exists := resolveConfigPath()
+
+	viper.SetConfigFile(configPath)
 	viper.AutomaticEnv()
-	if err := viper.ReadInConfig(); err != nil {
-		data := make(map[string]any)
-		defCfg := gemini.DefaultConfig()
-		cfg.AiEngine = "gemini"
-		cfg.GeminiLocation = "global"
-		cfg.Model = defCfg.Model
-		cfg.TopK = defCfg.TopK
-		cfg.TopP = defCfg.TopP
-		cfg.Temperature = defCfg.Temperature
-		cfg.OllamaBaseURL = "http://localhost:11434"
-		cfg.ParallelWorkers = 1
-		cfg.NumPredict = 1024
-		cfg.ChatGptBaseURL = "https://api.openai.com/v1"
-		_ = mapstructure.Decode(&cfg, &data)
-		_ = viper.MergeConfigMap(data)
-		viper.SetConfigType("env")
-		_ = viper.WriteConfigAs(".env")
-		fmt.Println("an empty .env file was created, please fill it out and try again.")
-		_ = rootCmd.Help()
+
+	if !exists {
+		fmt.Println("No configuration file found. Starting interactive configuration editor...")
+		if err := runInteractiveConfig(""); err != nil {
+			fmt.Printf("Error starting config editor: %v\n", err)
+		}
 		return
 	}
+
+	if err := viper.ReadInConfig(); err != nil {
+		panic(fmt.Sprintf("error reading config file: %v", err))
+	}
+
 	if err := viper.Unmarshal(&cfg); err != nil {
 		panic(err)
 	}

@@ -9,7 +9,6 @@ require (
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/google/jsonschema-go v0.4.3
 	github.com/labstack/echo/v4 v4.15.2
 	github.com/mattn/go-isatty v0.0.22
@@ -18,17 +17,18 @@ require (
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	github.com/theirish81/apicp v0.0.0-20260731045705-0784f392fbcb
-	github.com/theirish81/fml v0.1.2
+	github.com/theirish81/fml v0.2.0
 	github.com/theirish81/frags v1.0.0-rc4
 	github.com/theirish81/frags/anthropic v1.0.0-rc2
 	github.com/theirish81/frags/chatgpt v1.0.0-rc3
 	github.com/theirish81/frags/gemini v1.0.0-rc0
 	github.com/theirish81/frags/ollama v1.0.0-rc0
 	github.com/theirish81/fragsfunctions/data v0.7.0
-	github.com/theirish81/fragsfunctions/fs v0.7.0
+	github.com/theirish81/fragsfunctions/fs v0.8.0
 	github.com/theirish81/fragsfunctions/http v0.8.0
 	github.com/theirish81/fragsfunctions/postgres v0.7.0
 	github.com/theirish81/sesat2 v0.0.0-20260511100810-8e377902d6c0
+	github.com/theirish81/tui v0.0.0-20260802093906-22154f4c09c8
 	github.com/theirish81/zealql v0.0.0-20260513085909-eb2e76a09b48
 	google.golang.org/genai v1.58.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -38,6 +38,7 @@ require (
 	cloud.google.com/go v0.116.0 // indirect
 	cloud.google.com/go/compute/metadata v0.5.0 // indirect
 	github.com/alecthomas/participle/v2 v2.1.4 // indirect
+	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/avast/retry-go/v5 v5.0.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
@@ -64,6 +65,7 @@ require (
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.30.3 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.3+incompatible // indirect
+	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/pprof v0.0.0-20250317173921-a4b03ec1a45e // indirect
@@ -139,3 +141,6 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
+
+replace github.com/theirish81/frags v1.0.0-rc4 => ../
+replace github.com/theirish81/frags/gemini v1.0.0-rc0 => ../gemini

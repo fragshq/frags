@@ -36,22 +36,22 @@ const (
 )
 
 type Config struct {
-	GeminiServiceAccountPath string  `mapstructure:"GEMINI_SERVICE_ACCOUNT_PATH" yaml:"GEMINI_SERVICE_ACCOUNT_PATH"`
-	GeminiProjectID          string  `mapstructure:"GEMINI_PROJECT_ID" yaml:"GEMINI_PROJECT_ID"`
-	GeminiLocation           string  `mapstructure:"GEMINI_LOCATION" yaml:"GEMINI_LOCATION"`
-	ParallelWorkers          int     `mapstructure:"PARALLEL_WORKERS" yaml:"PARALLEL_WORKERS"`
-	OllamaBaseURL            string  `mapstructure:"OLLAMA_BASE_URL" yaml:"OLLAMA_BASE_URL"`
-	Model                    string  `mapstructure:"MODEL" yaml:"MODEL"`
-	AiEngine                 string  `mapstructure:"AI_ENGINE" yaml:"AI_ENGINE"`
-	Temperature              float32 `mapstructure:"TEMPERATURE" yaml:"TEMPERATURE"`
-	TopK                     float32 `mapstructure:"TOP_K" yaml:"TOP_K"`
-	TopP                     float32 `mapstructure:"TOP_P" yaml:"TOP_P"`
-	NumPredict               int     `mapstructure:"NUM_PREDICT" yaml:"NUM_PREDICT"`
-	ChatGptApiKey            string  `mapstructure:"CHATGPT_API_KEY" yaml:"CHATGPT_API_KEY"`
-	ChatGptBaseURL           string  `mapstructure:"CHATGPT_BASE_URL" yaml:"CHATGPT_BASE_URL"`
-	AnthropicApiKey          string  `mapstructure:"ANTHROPIC_API_KEY" yaml:"ANTHROPIC_API_KEY"`
-	ThinkingLevel            string  `mapstructure:"THINKING_LEVEL" yaml:"THINKING_LEVEL"`
-	OauthDisabled            bool    `mapstructure:"OAUTH_DISABLED" yaml:"OAUTH_DISABLED"`
+	GeminiServiceAccountPath string  `mapstructure:"GEMINI_SERVICE_ACCOUNT_PATH" yaml:"GEMINI_SERVICE_ACCOUNT_PATH" tui:"label=Gemini Service Account Path"`
+	GeminiProjectID          string  `mapstructure:"GEMINI_PROJECT_ID" yaml:"GEMINI_PROJECT_ID" tui:"label=Gemini Project ID"`
+	GeminiLocation           string  `mapstructure:"GEMINI_LOCATION" yaml:"GEMINI_LOCATION" tui:"label=Gemini Location"`
+	ParallelWorkers          int     `mapstructure:"PARALLEL_WORKERS" yaml:"PARALLEL_WORKERS" tui:"label=Parallel Workers"`
+	OllamaBaseURL            string  `mapstructure:"OLLAMA_BASE_URL" yaml:"OLLAMA_BASE_URL" tui:"label=Ollama Base URL"`
+	Model                    string  `mapstructure:"MODEL" yaml:"MODEL" tui:"label=Model Name,list"`
+	AiEngine                 string  `mapstructure:"AI_ENGINE" yaml:"AI_ENGINE" tui:"label=AI Engine,list,enum=gemini|ollama|chatgpt|anthropic|dummy"`
+	Temperature              float32 `mapstructure:"TEMPERATURE" yaml:"TEMPERATURE" tui:"label=Temperature"`
+	TopK                     float32 `mapstructure:"TOP_K" yaml:"TOP_K" tui:"label=Top K"`
+	TopP                     float32 `mapstructure:"TOP_P" yaml:"TOP_P" tui:"label=Top P"`
+	NumPredict               int     `mapstructure:"NUM_PREDICT" yaml:"NUM_PREDICT" tui:"label=Num Predict"`
+	ChatGptApiKey            string  `mapstructure:"CHATGPT_API_KEY" yaml:"CHATGPT_API_KEY" tui:"label=ChatGPT API Key"`
+	ChatGptBaseURL           string  `mapstructure:"CHATGPT_BASE_URL" yaml:"CHATGPT_BASE_URL" tui:"label=ChatGPT Base URL"`
+	AnthropicApiKey          string  `mapstructure:"ANTHROPIC_API_KEY" yaml:"ANTHROPIC_API_KEY" tui:"label=Anthropic API Key"`
+	ThinkingLevel            string  `mapstructure:"THINKING_LEVEL" yaml:"THINKING_LEVEL" tui:"label=Thinking Level,enum=LOW|MEDIUM|HIGH"`
+	OauthDisabled            bool    `mapstructure:"OAUTH_DISABLED" yaml:"OAUTH_DISABLED" tui:"label=OAuth Disabled"`
 }
 
 // guessAi tries to guess the AI engine based on the configuration.

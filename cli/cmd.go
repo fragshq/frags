@@ -42,7 +42,6 @@ var (
 	stdio        bool
 	ws           bool
 	tcp          bool
-	tools        bool
 )
 
 var rootCmd = cobra.Command{
@@ -67,6 +66,8 @@ func init() {
 	rootCmd.AddCommand(askCmd)
 	rootCmd.AddCommand(renderCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(mcpCmd)
+	rootCmd.AddCommand(collectionsCmd)
 	rootCmd.AddCommand(webCmd)
 	rootCmd.AddCommand(debugCmd)
 	rootCmd.AddCommand(lspCmd)

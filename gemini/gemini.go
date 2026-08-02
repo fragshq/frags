@@ -46,7 +46,7 @@ const topP float32 = 0.9
 
 const jsonContentType = "application/json"
 const textContentType = "text/plain"
-const defaultModel = "gemini-2.5-flash"
+const defaultModel = "gemini-3.1-flash-lite"
 
 // Ai is a wrapper around the genai client for Frags
 type Ai struct {
@@ -140,9 +140,9 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	cfg := genai.GenerateContentConfig{
 		ResponseMIMEType: ct,
 		ResponseSchema:   genAiSchema,
-		Temperature:      &d.config.Temperature,
-		TopK:             &d.config.TopK,
-		TopP:             &d.config.TopP,
+		Temperature:      FloatValOrNil(d.config.Temperature),
+		TopK:             FloatValOrNil(d.config.TopK),
+		TopP:             FloatValOrNil(d.config.TopP),
 		Tools:            tx,
 		SafetySettings: []*genai.SafetySetting{
 			{

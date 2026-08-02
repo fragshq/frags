@@ -15,8 +15,17 @@ It also includes a `render` command to format existing JSON/YAML data with a tem
 
 ## Configuration
 
-The first time you run the CLI, it will create a `.env` file for you. You will need to fill in the required values
-before you can use the tool.
+The CLI implements a robust, cross-platform configuration lookup strategy to resolve your settings. It searches for a `.env` file in the following order of precedence:
+
+1. **Environment Override**: The path specified in the `FRAGS_CONFIG` environment variable.
+2. **Current Working Directory**: `./.env` (ideal for project-specific settings).
+3. **User Standard Configuration Directory**:
+   * **Linux/Unix**: `~/.config/frags/.env`
+   * **macOS**: `~/Library/Application Support/frags/.env`
+   * **Windows**: `%APPDATA%\frags\.env`
+4. **Application Executable Directory**: A `.env` located right next to the compiled CLI binary (ideal for portable/standalone installations).
+
+If no configuration file is found anywhere upon starting, the CLI will automatically create a default `.env` file for you in the **User Standard Configuration Directory** (creating any missing parent directories automatically) to keep your project folders clean. You will need to fill in the required values before you can run sessions.
 
 The CLI can be configured using the following environment variables:
 
@@ -151,10 +160,30 @@ Run a script (JavaScript) on the scripting engine in the Frags context. This is 
 
 ### config
 
-Prints the current configuration.
+Manage the CLI configurations. This command contains two subcommands: `view` and `edit`.
+
+#### view
+Prints the currently resolved configuration settings to the console in YAML format.
 
 **Usage:**
-`./cli config`
+```sh
+./cli config view
+```
+
+#### edit
+Launches a beautiful, interactive Terminal UI (built with Bubble Tea and Lip Gloss) to view and edit configuration values directly in your terminal.
+
+**Usage:**
+```sh
+./cli config edit
+```
+
+**Interactive Controls:**
+-   `↑/↓` or `k/j`: Navigate/Scroll through the configuration keys.
+-   `Enter`: Edit the value of the highlighted key inline.
+-   `u`: Unset/delete the highlighted key completely from the configuration file.
+-   `s`: Save changes and exit.
+-   `q` or `esc`: Go back / cancel / exit without saving.
 
 ### render
 

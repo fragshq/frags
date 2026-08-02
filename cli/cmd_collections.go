@@ -18,40 +18,26 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
-var configCmd = &cobra.Command{
-	Use:   "config",
-	Short: "Manage the configuration",
-	Long:  `Manage the configuration. Use "view" to print the current configuration or "edit" to edit it interactively.`,
+var collectionsCmd = &cobra.Command{
+	Use:   "collections",
+	Short: "Manage tools collections",
+	Long:  `Manage tools collections. Use "edit" to edit collections configurations interactively.`,
 }
 
-var configViewCmd = &cobra.Command{
-	Use:   "view",
-	Short: "Print the current configuration",
-	Long:  `Prints the current configuration.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		globalConfig, _ := yaml.Marshal(cfg)
-		fmt.Println(string(globalConfig))
-	},
-}
-
-var configEditCmd = &cobra.Command{
+var collectionsEditCmd = &cobra.Command{
 	Use:   "edit",
-	Short: "Edit the configuration interactively",
-	Long:  `Launches a terminal UI to view and edit configuration keys for project or global environments.`,
+	Short: "Edit collections interactively",
+	Long:  `Launches a terminal UI to view, edit, add, and remove tools collections in project or global environments.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := runInteractiveConfig(""); err != nil {
+		if err := runInteractiveCollections(""); err != nil {
 			cmd.PrintErrln("Error:", err)
 		}
 	},
 }
 
 func init() {
-	configCmd.AddCommand(configViewCmd)
-	configCmd.AddCommand(configEditCmd)
+	collectionsCmd.AddCommand(collectionsEditCmd)
 }
