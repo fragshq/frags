@@ -143,3 +143,4 @@ require (
 )
 
 replace github.com/theirish81/frags v1.0.0-rc4 => ../
+replace github.com/theirish81/frags/gemini v1.0.0-rc0 => ../gemini

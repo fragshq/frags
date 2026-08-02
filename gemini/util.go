@@ -49,3 +49,10 @@ func NewFunctionResponseMap(data any, err error) FunctionResponseMap {
 * if the error is deemed not solvable, not recoverable or we hit the 3rd attempt, respond with the failure reasons, preceded by the flag [FATAL]`
 	return res
 }
+
+func FloatValOrNil(val float32) *float32 {
+	if val == 0 {
+		return nil
+	}
+	return &val
+}
