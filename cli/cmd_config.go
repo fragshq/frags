@@ -19,10 +19,8 @@ package main
 
 import (
 	"fmt"
-	"log/slog"
 
 	"github.com/spf13/cobra"
-	"github.com/theirish81/frags/log"
 	"gopkg.in/yaml.v3"
 )
 
@@ -35,34 +33,10 @@ var configCmd = &cobra.Command{
 var configViewCmd = &cobra.Command{
 	Use:   "view",
 	Short: "Print the current configuration",
-	Long:  `Prints the current configuration. It will additionally connect to the available MCP tools and print their function setup if --show-tools is specified.`,
+	Long:  `Prints the current configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		globalConfig, _ := yaml.Marshal(cfg)
-		fmt.Println("==== GLOBAL CONFIG ====")
 		fmt.Println(string(globalConfig))
-
-		toolsConfig, err := readToolsFile()
-		if err != nil {
-			cmd.PrintErrln(err)
-			return
-		}
-		if tools {
-			mcpTools, _, toolDefinitions, functions, err := connectMcpAndCollections(cmd.Context(), toolsConfig, log.NewStreamerLogger(slog.Default(), nil, log.InfoChannelLevel))
-			if err != nil {
-				cmd.PrintErrln(err)
-				return
-			}
-			defer func() {
-				_ = mcpTools.Close()
-			}()
-			toolsText, _ := yaml.Marshal(toolDefinitions)
-			fmt.Println("==== TOOLS CONFIG ====")
-			fmt.Println(string(toolsText))
-
-			functionsText, _ := yaml.Marshal(functions)
-			fmt.Println("==== FUNCTIONS CONFIG ====")
-			fmt.Println(string(functionsText))
-		}
 	},
 }
 
@@ -80,6 +54,4 @@ var configEditCmd = &cobra.Command{
 func init() {
 	configCmd.AddCommand(configViewCmd)
 	configCmd.AddCommand(configEditCmd)
-
-	configViewCmd.Flags().BoolVarP(&tools, "show-tools", "", false, "Show tools")
 }

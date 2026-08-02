@@ -42,7 +42,6 @@ var (
 	stdio        bool
 	ws           bool
 	tcp          bool
-	tools        bool
 )
 
 var rootCmd = cobra.Command{

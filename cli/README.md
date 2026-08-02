@@ -167,11 +167,8 @@ Prints the currently resolved configuration settings to the console in YAML form
 
 **Usage:**
 ```sh
-./cli config view [flags]
+./cli config view
 ```
-
-**Flags:**
--   `--show-tools`: Additionally queries and displays all available MCP tools and function schemas.
 
 #### edit
 Launches a beautiful, interactive Terminal UI (built with Bubble Tea and Lip Gloss) to view and edit configuration values directly in your terminal.
