@@ -33,6 +33,7 @@ const (
 	formatTemplate = "template"
 	formatYAML     = "yaml"
 	formatJSON     = "json"
+	formatEnv      = "bash"
 )
 
 type Config struct {

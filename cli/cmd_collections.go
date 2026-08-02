@@ -18,6 +18,9 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +28,26 @@ var collectionsCmd = &cobra.Command{
 	Use:   "collections",
 	Short: "Manage tools collections",
 	Long:  `Manage tools collections. Use "edit" to edit collections configurations interactively.`,
+}
+
+var collectionsViewCmd = &cobra.Command{
+	Use:   "view",
+	Short: "Print the current collections configuration",
+	Long:  "Print the current collections configuration",
+	Run: func(cmd *cobra.Command, args []string) {
+		tools, err := readToolsFile()
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+		dataBytes, err := json.MarshalIndent(tools.Collections, "", " ")
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+		out, _ := highlightOutput(dataBytes, formatJSON)
+		fmt.Println(string(out))
+	},
 }
 
 var collectionsEditCmd = &cobra.Command{
@@ -39,5 +62,6 @@ var collectionsEditCmd = &cobra.Command{
 }
 
 func init() {
+	collectionsCmd.AddCommand(collectionsViewCmd)
 	collectionsCmd.AddCommand(collectionsEditCmd)
 }

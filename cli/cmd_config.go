@@ -36,7 +36,8 @@ var configViewCmd = &cobra.Command{
 	Long:  `Prints the current configuration.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		globalConfig, _ := yaml.Marshal(cfg)
-		fmt.Println(string(globalConfig))
+		out, _ := highlightOutput(globalConfig, formatEnv)
+		fmt.Println(string(out))
 	},
 }
 

@@ -18,6 +18,9 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
@@ -25,6 +28,26 @@ var mcpCmd = &cobra.Command{
 	Use:   "mcp",
 	Short: "Manage MCP servers",
 	Long:  `Manage MCP servers. Use "edit" to edit MCP configurations interactively.`,
+}
+
+var mcpViewCmd = &cobra.Command{
+	Use:   "view",
+	Short: "Print the current MCP configuration",
+	Long:  "Print the current MCP configuration",
+	Run: func(cmd *cobra.Command, args []string) {
+		tools, err := readToolsFile()
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+		dataBytes, err := json.MarshalIndent(tools.McpServers, "", " ")
+		if err != nil {
+			cmd.PrintErrln(err)
+			return
+		}
+		out, _ := highlightOutput(dataBytes, formatJSON)
+		fmt.Println(string(out))
+	},
 }
 
 var mcpEditCmd = &cobra.Command{
@@ -40,4 +63,5 @@ var mcpEditCmd = &cobra.Command{
 
 func init() {
 	mcpCmd.AddCommand(mcpEditCmd)
+	mcpCmd.AddCommand(mcpViewCmd)
 }

@@ -150,6 +150,8 @@ func highlightOutput(text []byte, formatType string) ([]byte, error) {
 		lexer = "json"
 	case formatTemplate:
 		lexer = "markdown"
+	case formatEnv:
+		lexer = "bash"
 	default:
 		lexer = "yaml"
 	}

@@ -18,10 +18,10 @@ require (
 	github.com/spf13/viper v1.21.0
 	github.com/theirish81/apicp v0.0.0-20260731045705-0784f392fbcb
 	github.com/theirish81/fml v0.2.0
-	github.com/theirish81/frags v1.0.0-rc4
+	github.com/theirish81/frags v1.0.0-rc5
 	github.com/theirish81/frags/anthropic v1.0.0-rc2
 	github.com/theirish81/frags/chatgpt v1.0.0-rc3
-	github.com/theirish81/frags/gemini v1.0.0-rc0
+	github.com/theirish81/frags/gemini v1.0.0-rc1
 	github.com/theirish81/frags/ollama v1.0.0-rc0
 	github.com/theirish81/fragsfunctions/data v0.7.0
 	github.com/theirish81/fragsfunctions/fs v0.8.0
@@ -141,6 +141,3 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
-
-replace github.com/theirish81/frags v1.0.0-rc4 => ../
-replace github.com/theirish81/frags/gemini v1.0.0-rc0 => ../gemini
