@@ -138,9 +138,12 @@ func connectMcpAndCollections(ctx context.Context, toolsConfig ExtendedToolsConf
 		if v.Disabled {
 			continue
 		}
+		if len(v.ToolType) == 0 {
+			v.ToolType = k
+		}
 		switch v.ToolType {
 		case "fs":
-			t := fs.New()
+			t := fs.New(k)
 			functions = functions.WithFunctions(t.AsFunctions())
 			toolCollections = append(toolCollections, t)
 		case "postgres":

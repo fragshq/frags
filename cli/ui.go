@@ -22,6 +22,7 @@ import (
 	"os"
 	"strings"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
 
@@ -174,4 +175,56 @@ func RenderTextInputField(contextHeader, fieldLabel string, inputView string) st
 	s.WriteString("  " + inputView + "\n\n")
 	s.WriteString(StyleHelp.Render("  (Press Enter to save, Esc to cancel)") + "\n")
 	return s.String()
+}
+
+type fileChooserModel struct {
+	title    string
+	options  []fileOption
+	cursor   int
+	selected string
+	quit     bool
+}
+
+func (m fileChooserModel) Init() tea.Cmd {
+	return nil
+}
+
+func (m fileChooserModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		path, completed, quit := UpdateFileSelection(msg.String(), &m.cursor, m.options)
+		if quit {
+			m.quit = true
+			return m, tea.Quit
+		}
+		if completed {
+			m.selected = path
+			return m, tea.Quit
+		}
+	}
+	return m, nil
+}
+
+func (m fileChooserModel) View() string {
+	var s strings.Builder
+	s.WriteString("\n" + StyleHeader.Render("⚡ SELECT FILE ⚡") + "\n\n")
+	s.WriteString(RenderFileSelection(m.title, m.cursor, m.options))
+	return s.String()
+}
+
+func ChooseFile(title string, options []fileOption) (string, error) {
+	m := fileChooserModel{
+		title:   title,
+		options: options,
+	}
+	p := tea.NewProgram(m, tea.WithOutput(os.Stderr))
+	res, err := p.Run()
+	if err != nil {
+		return "", err
+	}
+	finalModel := res.(fileChooserModel)
+	if finalModel.quit {
+		return "", fmt.Errorf("cancelled")
+	}
+	return finalModel.selected, nil
 }

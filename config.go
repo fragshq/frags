@@ -38,9 +38,9 @@ func (t ToolsConfig) AsToolDefinitions() ToolDefinitions {
 
 // CollectionConfig defines the configuration for a collection
 type CollectionConfig struct {
-	ToolType string            `json:"tool_type,omitempty"`
-	Params   map[string]string `json:"params,omitempty"`
-	Disabled bool              `json:"disabled"`
+	ToolType string            `json:"tool_type,omitempty" tui:"label=Tool Type,enum=fs|postgres|http,subtitle"`
+	Params   map[string]string `json:"params,omitempty" tui:"label=Params"`
+	Disabled bool              `json:"disabled" tui:"label=Disabled,!badge"`
 }
 
 // ToolsCollectionConfigs is a map of collection names to collection configurations
@@ -77,22 +77,22 @@ func (t ToolsCollectionConfigs) AsToolDefinitions() ToolDefinitions {
 
 // McpServerConfig defines the configuration to connect to a MCP server
 type McpServerConfig struct {
-	Command          string            `json:"command,omitempty"`
-	Args             []string          `json:"args,omitempty"`
-	Env              map[string]string `json:"env,omitempty"`
-	Cwd              string            `json:"cwd,omitempty"`
-	Transport        string            `json:"transport,omitempty"`
-	Url              string            `json:"url,omitempty"`
-	Headers          map[string]string `json:"headers,omitempty"`
-	Disabled         bool              `json:"disabled"`
-	ClientID         *string           `json:"client_id,omitempty"`
-	ClientSecret     *string           `json:"client_secret,omitempty"`
-	AuthorizationURL *string           `json:"authorization_url,omitempty"`
-	TokenURL         *string           `json:"token_url,omitempty"`
-	Token            *string           `json:"token,omitempty"`
+	Command          string            `json:"command,omitempty" tui:"label=Command,subtitle"`
+	Args             []string          `json:"args,omitempty" tui:"label=Args"`
+	Env              map[string]string `json:"env,omitempty" tui:"label=Env"`
+	Cwd              string            `json:"cwd,omitempty" tui:"label=Cwd"`
+	Transport        string            `json:"transport,omitempty" tui:"label=Transport"`
+	Url              string            `json:"url,omitempty" tui:"label=URL,subtitle"`
+	Headers          map[string]string `json:"headers,omitempty" tui:"label=Headers"`
+	Disabled         bool              `json:"disabled" tui:"label=Disabled,!badge"`
+	ClientID         *string           `json:"client_id,omitempty" tui:"label=Client ID"`
+	ClientSecret     *string           `json:"client_secret,omitempty" tui:"label=Client Secret"`
+	AuthorizationURL *string           `json:"authorization_url,omitempty" tui:"label=Authorization URL"`
+	TokenURL         *string           `json:"token_url,omitempty" tui:"label=Token URL"`
+	Token            *string           `json:"token,omitempty" tui:"label=Token"`
 	// Placeholders for future functionalities and integrations
-	PreAuthorizedOauth  *mcpauth.TokenResult `json:"pre_authorized_oauth,omitempty"`
-	AuthorizationMethod *string              `json:"authorization_method,omitempty"`
+	PreAuthorizedOauth  *mcpauth.TokenResult `json:"pre_authorized_oauth,omitempty" tui:"label=Pre-Authorized OAuth"`
+	AuthorizationMethod *string              `json:"authorization_method,omitempty" tui:"label=Authorization Method"`
 }
 
 func (m *McpServerConfig) HttpHeaders() http.Header {

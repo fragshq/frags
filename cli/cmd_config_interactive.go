@@ -18,95 +18,21 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strconv"
 	"strings"
 
-	"github.com/charmbracelet/bubbles/textinput"
-	tea "github.com/charmbracelet/bubbletea"
+	"github.com/theirish81/tui"
 )
-
-type editState int
-
-const (
-	stateChooseFile editState = iota
-	stateListKeys
-	stateEditValue
-)
-
-type configKey struct {
-	envKey      string
-	label       string
-	description string
-	defVal      string
-}
-
-var standardKeys = []configKey{
-	{"AI_ENGINE", "AI Engine", "AI engine to use (gemini, ollama, chatgpt, anthropic, dummy)", "gemini"},
-	{"MODEL", "Model Name", "The specific model to use (e.g., gemini-2.5-flash, qwen3:latest)", ""},
-	{"TEMPERATURE", "Temperature", "Model-specific temperature parameter (e.g., 0.3)", "0.3"},
-	{"TOP_K", "Top K", "Model-specific top_k parameter (e.g., 64)", "64"},
-	{"TOP_P", "Top P", "Model-specific top_p parameter (e.g., 0.95)", "0.95"},
-	{"NUM_PREDICT", "Num Predict", "The maximum number of tokens to predict", "1024"},
-	{"PARALLEL_WORKERS", "Parallel Workers", "The number of parallel workers to use for processing", "1"},
-	{"OLLAMA_BASE_URL", "Ollama Base URL", "The base URL for your Ollama instance", "http://localhost:11434"},
-	{"GEMINI_SERVICE_ACCOUNT_PATH", "Gemini SA Path", "Path to Google Cloud service account JSON file", ""},
-	{"GEMINI_PROJECT_ID", "Gemini Project ID", "Your Google Cloud project ID", ""},
-	{"GEMINI_LOCATION", "Gemini Location", "The Google Cloud region for Gemini API", "global"},
-	{"CHATGPT_API_KEY", "ChatGPT API Key", "Your OpenAI API key", ""},
-	{"CHATGPT_BASE_URL", "ChatGPT Base URL", "The base URL for ChatGPT API", "https://api.openai.com/v1"},
-	{"ANTHROPIC_API_KEY", "Anthropic API Key", "Your Anthropic API key", ""},
-	{"THINKING_LEVEL", "Thinking Level", "Thinking level for supported models (LOW, MEDIUM, HIGH)", "LOW"},
-	{"OAUTH_DISABLED", "OAuth Disabled", "Whether OAuth authentication is disabled (true, false)", "false"},
-}
 
 type EnvLine struct {
 	Raw   string
 	Key   string
 	Value string
-}
-
-type interactiveModel struct {
-	state       editState
-	fileOptions []fileOption
-	fileCursor  int
-
-	filePath string
-	envLines []EnvLine
-	values   map[string]string // KEY -> VALUE
-
-	listCursor    int
-	listScroll    int
-	input         textinput.Model
-	enumCursor    int
-	editingCustom bool
-
-	saved bool
-	err   error
-}
-
-func (m *interactiveModel) getEnumOptions(sk configKey) []string {
-	if sk.envKey == "AI_ENGINE" {
-		return []string{"anthropic", "chatgpt", "gemini", "ollama"}
-	}
-	if sk.envKey == "MODEL" {
-		engine := strings.ToLower(m.values["AI_ENGINE"])
-		var opts []string
-		switch engine {
-		case "gemini":
-			opts = []string{"gemini-3.1-pro-preview", "gemini-3.5-flash-lite", "gemini-3.5-flash"}
-		case "anthropic":
-			opts = []string{"claude-sonnet-5", "claude-opus-5", "claude-haiku-4-5"}
-		case "chatgpt":
-			opts = []string{"gpt-4o-mini", "gpt-4o"}
-		}
-		if len(opts) > 0 {
-			opts = append(opts, "Custom (type manually)...")
-			return opts
-		}
-	}
-	return nil
 }
 
 func parseEnvFile(path string) ([]EnvLine, error) {
@@ -140,7 +66,6 @@ func parseEnvFile(path string) ([]EnvLine, error) {
 }
 
 func writeEnvFile(path string, envLines []EnvLine) error {
-	// Ensure directory exists
 	dir := filepath.Dir(path)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
@@ -156,384 +81,180 @@ func writeEnvFile(path string, envLines []EnvLine) error {
 	return os.WriteFile(path, []byte(strings.Join(lines, "\n")), 0644)
 }
 
+// defaultEnvSettings defines the initial keys and their default values used to partly populate a brand new env/config file.
+// You can manually fill or adjust these default values here.
+var defaultEnvSettings = []struct {
+	Key   string
+	Value string
+}{
+	{Key: "AI_ENGINE", Value: "gemini"},
+	{Key: "MODEL", Value: "gemini-3.1-flash-lite"},
+	{Key: "PARALLEL_WORKERS", Value: "1"},
+	{Key: "OLLAMA_BASE_URL", Value: "http://localhost:11434"},
+	{Key: "GEMINI_LOCATION", Value: "global"},
+	{Key: "GEMINI_PROJECT_ID", Value: ""},
+	{Key: "GEMINI_SERVICE_ACCOUNT_PATH", Value: ""},
+	{Key: "CHATGPT_API_KEY", Value: ""},
+	{Key: "CHATGPT_BASE_URL", Value: "https://api.openai.com/v1"},
+	{Key: "ANTHROPIC_API_KEY", Value: ""},
+	{Key: "THINKING_LEVEL", Value: "LOW"},
+	{Key: "NUM_PREDICT", Value: "6400"},
+	{Key: "TEMPERATURE", Value: "0.2"},
+	{Key: "TOP_K", Value: "64"},
+	{Key: "TOP_P", Value: "0.95"},
+}
+
 func createDefaultEnvLines() []EnvLine {
 	var lines []EnvLine
 	lines = append(lines, EnvLine{Raw: "# Frags CLI Configuration"})
 	lines = append(lines, EnvLine{Raw: ""})
-	for _, sk := range standardKeys {
+	for _, setting := range defaultEnvSettings {
 		lines = append(lines, EnvLine{
-			Key:   sk.envKey,
-			Value: sk.defVal,
-			Raw:   fmt.Sprintf(`%s="%s"`, sk.envKey, sk.defVal),
+			Key:   setting.Key,
+			Value: setting.Value,
 		})
 	}
 	return lines
 }
 
-func newInteractiveModel(preselectedPath string) interactiveModel {
-	var fileOpts []fileOption
-	fileOpts = append(fileOpts, fileOption{
-		label: "Current Directory (.env)",
-		path:  ".env",
-	})
+func envLinesToConfig(envLines []EnvLine) Config {
+	var c Config
+	val := reflect.ValueOf(&c).Elem()
+	typ := val.Type()
 
-	if uConfigDir, err := os.UserConfigDir(); err == nil {
-		fileOpts = append(fileOpts, fileOption{
-			label: "User Config Directory (global)",
-			path:  filepath.Join(uConfigDir, "frags", ".env"),
-		})
+	envMap := make(map[string]string)
+	for _, el := range envLines {
+		if el.Key != "" {
+			envMap[el.Key] = el.Value
+		}
 	}
 
-	ti := textinput.New()
-	ti.Focus()
-	ti.CharLimit = 150
-	ti.Width = 40
-
-	m := interactiveModel{
-		state:       stateChooseFile,
-		fileOptions: fileOpts,
-		input:       ti,
-		values:      make(map[string]string),
+	for i := 0; i < val.NumField(); i++ {
+		f := typ.Field(i)
+		tag := f.Tag.Get("mapstructure")
+		if tag == "" {
+			continue
+		}
+		strVal, ok := envMap[tag]
+		if !ok || strVal == "" {
+			continue
+		}
+		fieldVal := val.Field(i)
+		switch fieldVal.Kind() {
+		case reflect.String:
+			fieldVal.SetString(strVal)
+		case reflect.Int:
+			if iv, err := strconv.Atoi(strVal); err == nil {
+				fieldVal.SetInt(int64(iv))
+			}
+		case reflect.Float32:
+			if fv, err := strconv.ParseFloat(strVal, 32); err == nil {
+				fieldVal.SetFloat(fv)
+			}
+		case reflect.Bool:
+			if bv, err := strconv.ParseBool(strVal); err == nil {
+				fieldVal.SetBool(bv)
+			}
+		}
 	}
-
-	if preselectedPath != "" {
-		m.filePath = preselectedPath
-		lines, err := parseEnvFile(preselectedPath)
-		if err != nil {
-			if os.IsNotExist(err) {
-				m.envLines = createDefaultEnvLines()
-			} else {
-				m.err = err
-				return m
-			}
-		} else {
-			m.envLines = lines
-		}
-
-		// Populate values map
-		for _, el := range m.envLines {
-			if el.Key != "" {
-				m.values[el.Key] = el.Value
-			}
-		}
-		// Also populate standard keys with empty if they aren't in the file yet
-		for _, sk := range standardKeys {
-			if _, ok := m.values[sk.envKey]; !ok {
-				m.values[sk.envKey] = ""
-			}
-		}
-
-		m.state = stateListKeys
-		m.listCursor = 0
-		m.listScroll = 0
-	}
-
-	return m
+	return c
 }
 
-func (m interactiveModel) Init() tea.Cmd {
-	return textinput.Blink
-}
+func configToEnvLines(envLines []EnvLine, c Config) []EnvLine {
+	val := reflect.ValueOf(c)
+	typ := val.Type()
 
-func (m interactiveModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "ctrl+c":
-			return m, tea.Quit
+	updates := make(map[string]string)
+	for i := 0; i < val.NumField(); i++ {
+		f := typ.Field(i)
+		tag := f.Tag.Get("mapstructure")
+		if tag == "" {
+			continue
 		}
+		fieldVal := val.Field(i)
+		var strVal string
+		switch fieldVal.Kind() {
+		case reflect.String:
+			strVal = fieldVal.String()
+		case reflect.Int:
+			strVal = strconv.Itoa(int(fieldVal.Int()))
+		case reflect.Float32:
+			strVal = strconv.FormatFloat(fieldVal.Float(), 'g', -1, 32)
+		case reflect.Float64:
+			strVal = strconv.FormatFloat(fieldVal.Float(), 'g', -1, 64)
+		case reflect.Bool:
+			strVal = strconv.FormatBool(fieldVal.Bool())
+		}
+		updates[tag] = strVal
+	}
 
-		switch m.state {
-		case stateChooseFile:
-			path, completed, quit := UpdateFileSelection(msg.String(), &m.fileCursor, m.fileOptions)
-			if quit {
-				return m, tea.Quit
-			}
-			if completed {
-				m.filePath = path
-				// Load file if exists, else load empty default lines
-				lines, err := parseEnvFile(m.filePath)
-				if err != nil {
-					if os.IsNotExist(err) {
-						m.envLines = createDefaultEnvLines()
-					} else {
-						m.err = err
-						return m, tea.Quit
-					}
-				} else {
-					m.envLines = lines
-				}
-
-				// Populate values map
-				for _, el := range m.envLines {
-					if el.Key != "" {
-						m.values[el.Key] = el.Value
-					}
-				}
-				// Also populate standard keys with empty if they aren't in the file yet
-				for _, sk := range standardKeys {
-					if _, ok := m.values[sk.envKey]; !ok {
-						m.values[sk.envKey] = ""
-					}
-				}
-
-				m.state = stateListKeys
-				m.listCursor = 0
-				m.listScroll = 0
-			}
-
-		case stateListKeys:
-			switch msg.String() {
-			case "up", "k":
-				if m.listCursor > 0 {
-					m.listCursor--
-					if m.listCursor < m.listScroll {
-						m.listScroll = m.listCursor
-					}
-				}
-			case "down", "j":
-				if m.listCursor < len(standardKeys)-1 {
-					m.listCursor++
-					if m.listCursor >= m.listScroll+10 {
-						m.listScroll = m.listCursor - 9
-					}
-				}
-			case "enter":
-				m.state = stateEditValue
-				m.editingCustom = false
-				sk := standardKeys[m.listCursor]
-				opts := m.getEnumOptions(sk)
-				if len(opts) > 0 {
-					currentVal := m.values[sk.envKey]
-					m.enumCursor = 0
-					for idx, opt := range opts {
-						if opt == currentVal {
-							m.enumCursor = idx
-							break
-						}
-					}
-				} else {
-					m.input.SetValue(m.values[sk.envKey])
-					m.input.Focus()
-				}
-			case "u":
-				// Unset/remove the selected key
-				sk := standardKeys[m.listCursor]
-				m.values[sk.envKey] = ""
-				var newLines []EnvLine
-				for _, el := range m.envLines {
-					if el.Key != sk.envKey {
-						newLines = append(newLines, el)
-					}
-				}
-				m.envLines = newLines
-			case "s":
-				// Save & Quit
-				err := writeEnvFile(m.filePath, m.envLines)
-				if err != nil {
-					m.err = err
-				} else {
-					m.saved = true
-				}
-				return m, tea.Quit
-			case "q", "esc":
-				m.state = stateChooseFile
-			}
-
-		case stateEditValue:
-			sk := standardKeys[m.listCursor]
-			opts := m.getEnumOptions(sk)
-			if len(opts) > 0 && !m.editingCustom {
-				switch msg.String() {
-				case "up", "k":
-					if m.enumCursor > 0 {
-						m.enumCursor--
-					}
-				case "down", "j":
-					if m.enumCursor < len(opts)-1 {
-						m.enumCursor++
-					}
-				case "enter":
-					selected := opts[m.enumCursor]
-					if selected == "Custom (type manually)..." {
-						m.editingCustom = true
-						m.input.SetValue(m.values[sk.envKey])
-						m.input.Focus()
-					} else {
-						newVal := selected
-						m.values[sk.envKey] = newVal
-
-						found := false
-						for i, el := range m.envLines {
-							if el.Key == sk.envKey {
-								m.envLines[i].Value = newVal
-								found = true
-								break
-							}
-						}
-						if !found {
-							m.envLines = append(m.envLines, EnvLine{
-								Key:   sk.envKey,
-								Value: newVal,
-							})
-						}
-						m.state = stateListKeys
-					}
-				case "esc":
-					m.state = stateListKeys
-				}
-			} else {
-				switch msg.String() {
-				case "enter":
-					newVal := m.input.Value()
-					m.values[sk.envKey] = newVal
-
-					// Update or append in envLines
-					found := false
-					for i, el := range m.envLines {
-						if el.Key == sk.envKey {
-							m.envLines[i].Value = newVal
-							found = true
-							break
-						}
-					}
-					if !found {
-						m.envLines = append(m.envLines, EnvLine{
-							Key:   sk.envKey,
-							Value: newVal,
-						})
-					}
-
-					m.state = stateListKeys
-				case "esc":
-					if len(opts) > 0 {
-						m.editingCustom = false
-					} else {
-						m.state = stateListKeys
-					}
-				default:
-					var cmd tea.Cmd
-					m.input, cmd = m.input.Update(msg)
-					return m, cmd
-				}
+	updatedMap := make(map[string]bool)
+	for i, el := range envLines {
+		if el.Key != "" {
+			if newVal, ok := updates[el.Key]; ok {
+				envLines[i].Value = newVal
+				updatedMap[el.Key] = true
 			}
 		}
 	}
 
-	return m, nil
-}
-
-func (m interactiveModel) View() string {
-	var s strings.Builder
-
-	s.WriteString("\n" + StyleHeader.Render("⚡ FRAGS CONFIG EDITOR ⚡") + "\n\n")
-
-	switch m.state {
-	case stateChooseFile:
-		s.WriteString(RenderFileSelection("Select which configuration file to edit:", m.fileCursor, m.fileOptions))
-
-	case stateListKeys:
-		s.WriteString(fmt.Sprintf("  File: %s\n\n", StyleValActive.Render(m.filePath)))
-		s.WriteString("  Select a configuration key to edit:\n\n")
-
-		limit := m.listScroll + 10
-		if limit > len(standardKeys) {
-			limit = len(standardKeys)
-		}
-
-		for i := m.listScroll; i < limit; i++ {
-			sk := standardKeys[i]
-			cursor := "  "
-			keyStyle := StyleLabelDefault
-			valStyle := StyleValDefault
-
-			if i == m.listCursor {
-				cursor = StyleCursor.Render("> ")
-				keyStyle = StyleLabelActive
-				valStyle = StyleValActive
-			}
-
-			val := m.values[sk.envKey]
-			if val == "" {
-				val = StyleMuted.Render("<not set>")
-			} else {
-				val = fmt.Sprintf(`"%s"`, val)
-			}
-
-			// Format columns cleanly
-			s.WriteString(fmt.Sprintf("%s%-30s = %s\n", cursor, keyStyle.Render(sk.envKey), valStyle.Render(val)))
-		}
-
-		// Scroll indicators
-		scrollText := ""
-		if m.listScroll > 0 {
-			scrollText += "  ↑ (more keys above)"
-		}
-		if limit < len(standardKeys) {
-			if scrollText != "" {
-				scrollText += " | "
-			}
-			scrollText += "↓ (more keys below)"
-		}
-		if scrollText != "" {
-			s.WriteString("\n" + StyleMuted.Render(scrollText) + "\n")
-		}
-
-		// Active key description box
-		activeKey := standardKeys[m.listCursor]
-
-		s.WriteString("\n" + StyleDescBox.Render(
-			fmt.Sprintf("%s\n%s",
-				StyleDescTitle.Render(activeKey.label),
-				StyleDescText.Render(activeKey.description),
-			),
-		) + "\n")
-
-		s.WriteString(StyleHelp.Render("\n  ↑/↓: Navigate | Enter: Edit | u: Unset | s: Save & Exit | q/esc: Go Back") + "\n")
-
-	case stateEditValue:
-		activeKey := standardKeys[m.listCursor]
-		s.WriteString(fmt.Sprintf("  Editing: %s\n\n", StyleLabelActive.Render(activeKey.envKey)))
-		s.WriteString(fmt.Sprintf("  %s\n\n", StyleLabelDefault.Render(activeKey.description)))
-
-		opts := m.getEnumOptions(activeKey)
-		if len(opts) > 0 && !m.editingCustom {
-			s.WriteString("  Choose an option:\n\n")
-			for idx, opt := range opts {
-				cursor := "  "
-				optStyle := StyleLabelDefault
-				if idx == m.enumCursor {
-					cursor = StyleCursor.Render("> ")
-					if opt == "Custom (type manually)..." {
-						optStyle = StyleOptCustom
-					} else {
-						optStyle = StyleValActive
-					}
-				}
-				s.WriteString(fmt.Sprintf("%s%s\n", cursor, optStyle.Render(opt)))
-			}
-			s.WriteString("\n" + StyleHelp.Render("  (Use Up/Down arrows, Enter to select, Esc to cancel)") + "\n")
-		} else {
-			s.WriteString(RenderTextInputField("", "Value", m.input.View()))
+	for k, v := range updates {
+		if !updatedMap[k] && v != "" {
+			envLines = append(envLines, EnvLine{Key: k, Value: v})
 		}
 	}
 
-	return s.String()
+	return envLines
 }
 
 func runInteractiveConfig(preselectedPath string) error {
-	m := newInteractiveModel(preselectedPath)
-	p := tea.NewProgram(m, tea.WithOutput(os.Stderr))
-	finalModel, err := p.Run()
+	filePath := preselectedPath
+	if filePath == "" {
+		var fileOpts []fileOption
+		fileOpts = append(fileOpts, fileOption{
+			label: "Current Directory (.env)",
+			path:  ".env",
+		})
+		if uConfigDir, err := os.UserConfigDir(); err == nil {
+			fileOpts = append(fileOpts, fileOption{
+				label: "User Config Directory (global)",
+				path:  filepath.Join(uConfigDir, "frags", ".env"),
+			})
+		}
+
+		selected, err := ChooseFile("Select which configuration file to edit:", fileOpts)
+		if err != nil {
+			return err
+		}
+		filePath = selected
+	}
+
+	lines, err := parseEnvFile(filePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			lines = createDefaultEnvLines()
+		} else {
+			return err
+		}
+	}
+
+	cfgStruct := envLinesToConfig(lines)
+
+	err = tui.Run[Config](&cfgStruct, tui.WithTitle[Config]("Frags Config Editor"))
+	if err != nil {
+		if errors.Is(err, tui.ErrCancelled) {
+			fmt.Println("\nEditing cancelled. No changes were saved.")
+			return nil
+		}
+		return err
+	}
+
+	updatedLines := configToEnvLines(lines, cfgStruct)
+	err = writeEnvFile(filePath, updatedLines)
 	if err != nil {
 		return err
 	}
-	mResult := finalModel.(interactiveModel)
-	if mResult.err != nil {
-		return mResult.err
-	}
-	if mResult.saved {
-		fmt.Printf("\nSuccessfully saved configuration to: %s\n", mResult.filePath)
-	}
+
+	fmt.Printf("\nSuccessfully saved configuration to: %s\n", filePath)
 	return nil
 }
