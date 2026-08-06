@@ -5,7 +5,7 @@ go 1.25.4
 require (
 	cloud.google.com/go/auth v0.9.3
 	github.com/alecthomas/chroma/v2 v2.27.0
-	github.com/anthropics/anthropic-sdk-go v1.51.0
+	github.com/anthropics/anthropic-sdk-go v1.61.0
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
@@ -19,7 +19,7 @@ require (
 	github.com/theirish81/apicp v0.0.0-20260731045705-0784f392fbcb
 	github.com/theirish81/fml v0.2.0
 	github.com/theirish81/frags v1.0.0-rc5
-	github.com/theirish81/frags/anthropic v1.0.0-rc2
+	github.com/theirish81/frags/anthropic v1.0.0-rc3
 	github.com/theirish81/frags/chatgpt v1.0.0-rc3
 	github.com/theirish81/frags/gemini v1.0.0-rc1
 	github.com/theirish81/frags/ollama v1.0.0-rc0
