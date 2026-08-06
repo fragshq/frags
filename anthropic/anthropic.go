@@ -23,11 +23,11 @@ import (
 const engine = "anthropic"
 
 // Anthropic defaults
-const temperature float32 = 0.4
+const temperature float32 = 0.0
 const topK float32 = 0
 const topP float32 = 0
 
-const defaultModel = "claude-3-5-sonnet-20241022"
+const defaultModel = "claude-sonnet-5"
 
 // Ai is a wrapper around the anthropic client for Frags
 type Ai struct {
@@ -290,7 +290,7 @@ func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]anthropic.ToolUnionP
 			}
 		case frags.ToolTypeInternetSearch:
 			tx = append(tx, anthropic.ToolUnionParam{
-				OfWebSearchTool20260209: &anthropic.WebSearchTool20260209Param{
+				OfWebSearchTool20250305: &anthropic.WebSearchTool20250305Param{
 					MaxUses: anthropic.Int(2),
 				},
 			})

@@ -3,7 +3,7 @@ module github.com/theirish81/frags/anthropic
 go 1.25.4
 
 require (
-	github.com/anthropics/anthropic-sdk-go v1.51.0
+	github.com/anthropics/anthropic-sdk-go v1.61.0
 	github.com/avast/retry-go/v5 v5.0.0
 	github.com/jinzhu/copier v0.4.0
 	github.com/theirish81/frags v1.0.0-rc1
