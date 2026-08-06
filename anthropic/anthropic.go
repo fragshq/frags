@@ -39,13 +39,14 @@ type Ai struct {
 }
 
 type Config struct {
-	Model       string        `yaml:"model" json:"model"`
-	Temperature float32       `yaml:"temperature" json:"temperature"`
-	TopK        float32       `yaml:"topK" json:"topK"`
-	TopP        float32       `yaml:"topP" json:"topP"`
-	MaxTokens   int           `yaml:"maxTokens" json:"maxTokens"`
-	Attempts    int           `yaml:"attempts" json:"attempts"`
-	RetryDelay  time.Duration `yaml:"retryDelay" json:"retryDelay"`
+	Model         string                       `yaml:"model" json:"model"`
+	Temperature   float32                      `yaml:"temperature" json:"temperature"`
+	TopK          float32                      `yaml:"topK" json:"topK"`
+	TopP          float32                      `yaml:"topP" json:"topP"`
+	MaxTokens     int                          `yaml:"maxTokens" json:"maxTokens"`
+	Attempts      int                          `yaml:"attempts" json:"attempts"`
+	RetryDelay    time.Duration                `yaml:"retryDelay" json:"retryDelay"`
+	ThinkingLevel anthropic.OutputConfigEffort `yaml:"thinkingLevel" json:"thinkingLevel"`
 }
 
 func DefaultConfig() Config {
@@ -171,12 +172,12 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 			if d.config.TopP > 0 {
 				params.TopP = anthropic.Float(float64(d.config.TopP))
 			}
-
+			params.OutputConfig = anthropic.OutputConfigParam{
+				Effort: d.config.ThinkingLevel,
+			}
 			if sx != nil {
-				params.OutputConfig = anthropic.OutputConfigParam{
-					Format: anthropic.JSONOutputFormatParam{
-						Schema: SchemaToClaudeMap(sx),
-					},
+				params.OutputConfig.Format = anthropic.JSONOutputFormatParam{
+					Schema: SchemaToClaudeMap(sx),
 				}
 			}
 
