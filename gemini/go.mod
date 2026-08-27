@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/avast/retry-go/v5 v5.0.0
-	github.com/fragshq/frags v1.0.0-rc0
+	github.com/fragshq/frags v1.0.0-rc6
 	github.com/jinzhu/copier v0.4.0
 	google.golang.org/api v0.197.0
 	google.golang.org/genai v1.58.0
@@ -59,5 +59,3 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
-
-replace github.com/fragshq/frags v1.0.0-rc0 => ../

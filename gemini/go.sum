@@ -26,6 +26,8 @@ github.com/expr-lang/expr v1.17.8 h1:W1loDTT+0PQf5YteHSTpju2qfUfNoBt4yw9+wOEU9VM
 github.com/expr-lang/expr v1.17.8/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
 github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a h1:zVZCGCpPtNogxtKw+ij4jYiUewEVV/d+LnPyIrbgUho=
 github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a/go.mod h1:DYhYU5v/g45OZaPeMGebSaqk0cHJ9LJIdbNAQ5arOms=
+github.com/fragshq/frags v1.0.0-rc6 h1:JyFl6F/bLS2+780wD0433D+lV7Z9pG+Lmo9qyfrWhFY=
+github.com/fragshq/frags v1.0.0-rc6/go.mod h1:UpgUTZLNGzf76FQt6xM5qQXIs2/QATWvV5WWQoO7vME=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381 h1:qP4W/vHZmSXwH39YnyB8S5YMMmkeuSsVpSWNJSvxsio=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381/go.mod h1:xrP7R7yiSuv2B4Ij07MFdyq7VlRQSZ8hSQFnvmMQBn8=
 github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44 h1:2BvPv4uXgC1wx0oiiYWDq7Hatbvr2hzQSYUEXqETSEY=

@@ -2,7 +2,7 @@ module github.com/fragshq/frags/ollama
 
 go 1.25.4
 
-require github.com/fragshq/frags v1.0.0-rc2
+require github.com/fragshq/frags v1.0.0-rc6
 
 require (
 	github.com/avast/retry-go/v5 v5.0.0 // indirect
@@ -42,5 +42,3 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
-
-replace github.com/fragshq/frags v1.0.0-rc2 => ../
