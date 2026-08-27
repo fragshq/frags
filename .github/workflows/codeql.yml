@@ -54,7 +54,7 @@ jobs:
         git config --global url."https://x-access-token:${GOPRIVATE_TOKEN}@github.com/".insteadOf "https://github.com/"
         
         # Tell Go to bypass proxy.golang.org for your private orgs/users
-        go env -w GOPRIVATE="github.com/theirish81/*"
+        go env -w GOPRIVATE="github.com/fragshq/*"
 
     - name: Pre-fetch Go modules
       if: matrix.language == 'go'

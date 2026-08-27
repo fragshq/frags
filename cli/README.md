@@ -85,7 +85,7 @@ PARALLEL_WORKERS=4
 
 ## Download
 You can find pre-built binaries for Windows, Linux, and macOS on the
-[Releases page](https://github.com/theirish81/frags/releases). Remember these binaries are not signed, so you may need
+[Releases page](https://github.com/fragshq/frags/releases). Remember these binaries are not signed, so you may need
 to disable your security settings to run them.
 
 ## Commands
