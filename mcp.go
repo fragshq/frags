@@ -25,13 +25,13 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/fragshq/doauth"
+	"github.com/fragshq/frags/httpfactory"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/mcpauth"
+	"github.com/fragshq/frags/schema"
+	"github.com/fragshq/frags/util"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/theirish81/doauth"
-	"github.com/theirish81/frags/httpfactory"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/mcpauth"
-	"github.com/theirish81/frags/schema"
-	"github.com/theirish81/frags/util"
 )
 
 // McpTools returns  McpTool instances for each server configuration

@@ -21,9 +21,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/schema"
-	"github.com/theirish81/frags/util"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/schema"
+	"github.com/fragshq/frags/util"
 )
 
 // Ai is an interface for AI models.

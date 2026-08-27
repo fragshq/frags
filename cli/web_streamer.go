@@ -23,8 +23,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/fragshq/frags/log"
 	"github.com/labstack/echo/v4"
-	"github.com/theirish81/frags/log"
 )
 
 type Streamer struct {

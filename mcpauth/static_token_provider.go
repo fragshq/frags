@@ -22,7 +22,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/theirish81/frags/httpfactory"
+	"github.com/fragshq/frags/httpfactory"
 )
 
 // StaticTokenProvider is an AuthProvider for situations where you already have

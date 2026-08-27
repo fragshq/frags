@@ -1,12 +1,12 @@
-module github.com/theirish81/frags/anthropic
+module github.com/fragshq/frags/anthropic
 
 go 1.25.4
 
 require (
 	github.com/anthropics/anthropic-sdk-go v1.61.0
 	github.com/avast/retry-go/v5 v5.0.0
+	github.com/fragshq/frags v1.0.0-rc1
 	github.com/jinzhu/copier v0.4.0
-	github.com/theirish81/frags v1.0.0-rc1
 )
 
 require (
@@ -15,6 +15,9 @@ require (
 	github.com/buger/jsonparser v1.1.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/expr-lang/expr v1.17.8 // indirect
+	github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a // indirect
+	github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381 // indirect
+	github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
@@ -26,7 +29,7 @@ require (
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
-	github.com/modelcontextprotocol/go-sdk v1.6.0 // indirect
+	github.com/modelcontextprotocol/go-sdk v1.7.0 // indirect
 	github.com/ncruces/go-strftime v1.0.0 // indirect
 	github.com/pb33f/ordered-map/v2 v2.3.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
@@ -34,9 +37,6 @@ require (
 	github.com/segmentio/asm v1.1.3 // indirect
 	github.com/segmentio/encoding v0.5.4 // indirect
 	github.com/standard-webhooks/standard-webhooks/libraries v0.0.1 // indirect
-	github.com/theirish81/doauth v0.0.0-20260427082048-18b593885cb7 // indirect
-	github.com/theirish81/sesat2 v0.0.0-20260511100810-8e377902d6c0 // indirect
-	github.com/theirish81/zealql v0.0.0-20260513085909-eb2e76a09b48 // indirect
 	github.com/tidwall/gjson v1.18.0 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -48,9 +48,12 @@ require (
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.45.0 // indirect
 	golang.org/x/text v0.37.0 // indirect
+	golang.org/x/time v0.15.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.72.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
+
+replace github.com/fragshq/frags v1.0.0-rc1 => ../

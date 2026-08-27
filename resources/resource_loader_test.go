@@ -22,8 +22,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/fragshq/frags/util"
 	"github.com/stretchr/testify/assert"
-	"github.com/theirish81/frags/util"
 )
 
 func TestFileResourceLoader(t *testing.T) {

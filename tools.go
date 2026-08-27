@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/theirish81/frags/schema"
+	"github.com/fragshq/frags/schema"
 )
 
 type ToolType string

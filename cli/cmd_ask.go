@@ -22,12 +22,12 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/schema"
+	"github.com/fragshq/frags/util"
 	"github.com/spf13/cobra"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/schema"
-	"github.com/theirish81/frags/util"
 )
 
 var internetSearch bool

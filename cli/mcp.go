@@ -8,14 +8,14 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/schema"
+	"github.com/fragshq/frags/util"
 	"github.com/google/jsonschema-go/jsonschema"
 	"github.com/labstack/echo/v4"
 	"github.com/modelcontextprotocol/go-sdk/mcp"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/schema"
-	"github.com/theirish81/frags/util"
 )
 
 type planDef struct {

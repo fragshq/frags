@@ -1,7 +1,7 @@
 package ollama
 
 import (
-	"github.com/theirish81/frags/schema"
+	"github.com/fragshq/frags/schema"
 )
 
 // Message represents a message sent to the LLM.

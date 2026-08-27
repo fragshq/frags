@@ -20,8 +20,8 @@ package frags
 import (
 	"testing"
 
+	"github.com/fragshq/frags/util"
 	"github.com/stretchr/testify/assert"
-	"github.com/theirish81/frags/util"
 )
 
 func TestPreCallCtx(t *testing.T) {

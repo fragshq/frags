@@ -25,9 +25,9 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/theirish81/doauth"
-	"github.com/theirish81/frags/httpfactory"
-	"github.com/theirish81/frags/log"
+	"github.com/fragshq/doauth"
+	"github.com/fragshq/frags/httpfactory"
+	"github.com/fragshq/frags/log"
 	"golang.org/x/oauth2"
 )
 

@@ -25,8 +25,8 @@ import (
 	"path/filepath"
 	"reflect"
 
+	"github.com/fragshq/frags/util"
 	"github.com/samber/lo"
-	"github.com/theirish81/frags/util"
 )
 
 // ResourceData is a piece of data the LLM can use.

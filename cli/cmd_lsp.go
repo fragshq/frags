@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra"
 )
-import "github.com/theirish81/fml/lsp"
+import "github.com/fragshq/fml/lsp"
 
 var lspCmd = &cobra.Command{
 	Use:   "lsp",

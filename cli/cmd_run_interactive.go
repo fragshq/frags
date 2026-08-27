@@ -29,10 +29,10 @@ import (
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/util"
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/util"
 )
 
 type runResult struct {

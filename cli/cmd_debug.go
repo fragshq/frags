@@ -24,12 +24,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/scriptengines"
+	"github.com/fragshq/frags/util"
 	"github.com/spf13/cobra"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/scriptengines"
-	"github.com/theirish81/frags/util"
 	"gopkg.in/yaml.v3"
 )
 

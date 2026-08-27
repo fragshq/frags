@@ -22,8 +22,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/theirish81/doauth"
-	"github.com/theirish81/frags/log"
+	"github.com/fragshq/doauth"
+	"github.com/fragshq/frags/log"
 	"golang.org/x/oauth2"
 )
 

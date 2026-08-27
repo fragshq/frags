@@ -25,10 +25,10 @@ import (
 	"regexp"
 	"strings"
 
-	fmlCompiler "github.com/theirish81/fml/compiler"
-	fmlParser "github.com/theirish81/fml/parser"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/util"
+	fmlCompiler "github.com/fragshq/fml/compiler"
+	fmlParser "github.com/fragshq/fml/parser"
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/util"
 	"gopkg.in/yaml.v3"
 )
 

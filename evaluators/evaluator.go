@@ -25,8 +25,8 @@ import (
 	"text/template"
 
 	"github.com/expr-lang/expr"
-	"github.com/theirish81/frags/util"
-	"github.com/theirish81/zealql"
+	"github.com/fragshq/frags/util"
+	"github.com/fragshq/zealql"
 )
 
 const (

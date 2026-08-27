@@ -19,10 +19,10 @@ package frags
 
 import (
 	"github.com/blues/jsonata-go"
+	"github.com/fragshq/frags/evaluators"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/util"
 	"github.com/jmespath/go-jmespath"
-	"github.com/theirish81/frags/evaluators"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/util"
 )
 
 type Parser string

@@ -20,7 +20,7 @@ package frags
 import (
 	"slices"
 
-	"github.com/theirish81/frags/evaluators"
+	"github.com/fragshq/frags/evaluators"
 )
 
 // Dependency defines whether this session can run or should:

@@ -20,9 +20,9 @@ package frags
 import (
 	"strings"
 
-	"github.com/theirish81/frags/evaluators"
-	"github.com/theirish81/frags/scoper"
-	"github.com/theirish81/frags/util"
+	"github.com/fragshq/frags/evaluators"
+	"github.com/fragshq/frags/scoper"
+	"github.com/fragshq/frags/util"
 )
 
 // contextualizePrompt adds the current context to the prompt. This includes the already extracted context, if enabled,

@@ -24,8 +24,8 @@ import (
 	"os"
 	"text/template"
 
+	"github.com/fragshq/frags/util"
 	"github.com/spf13/cobra"
-	"github.com/theirish81/frags/util"
 	"gopkg.in/yaml.v3"
 )
 

@@ -23,7 +23,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/theirish81/frags/log"
+	"github.com/fragshq/frags/log"
 )
 
 // AuthProvider defines the standard interface for all authentication mechanisms in frags.

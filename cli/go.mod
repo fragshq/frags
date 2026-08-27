@@ -1,4 +1,4 @@
-module github.com/theirish81/frags/cli
+module github.com/fragshq/frags/cli
 
 go 1.25.4
 
@@ -12,24 +12,21 @@ require (
 	github.com/google/jsonschema-go v0.4.3
 	github.com/labstack/echo/v4 v4.15.2
 	github.com/mattn/go-isatty v0.0.22
-	github.com/modelcontextprotocol/go-sdk v1.6.0
+	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/samber/lo v1.53.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
-	github.com/theirish81/apicp v0.0.0-20260731045705-0784f392fbcb
-	github.com/theirish81/fml v0.2.0
-	github.com/theirish81/frags v1.0.0-rc5
-	github.com/theirish81/frags/anthropic v1.0.0-rc3
-	github.com/theirish81/frags/chatgpt v1.0.0-rc3
-	github.com/theirish81/frags/gemini v1.0.0-rc1
-	github.com/theirish81/frags/ollama v1.0.0-rc0
+	github.com/fragshq/frags v1.0.0-rc5
+	github.com/fragshq/frags/anthropic v1.0.0-rc3
+	github.com/fragshq/frags/chatgpt v1.0.0-rc3
+	github.com/fragshq/frags/gemini v1.0.0-rc1
+	github.com/fragshq/frags/ollama v1.0.0-rc0
 	github.com/theirish81/fragsfunctions/data v0.7.0
 	github.com/theirish81/fragsfunctions/fs v0.8.0
 	github.com/theirish81/fragsfunctions/http v0.8.0
 	github.com/theirish81/fragsfunctions/postgres v0.7.0
-	github.com/theirish81/sesat2 v0.0.0-20260511100810-8e377902d6c0
+	github.com/fragshq/sesat2 v0.0.0-20260511100810-8e377902d6c0
 	github.com/theirish81/tui v0.0.0-20260802093906-22154f4c09c8
-	github.com/theirish81/zealql v0.0.0-20260513085909-eb2e76a09b48
 	google.golang.org/genai v1.58.0
 	gopkg.in/yaml.v3 v3.0.1
 )
@@ -51,11 +48,12 @@ require (
 	github.com/clipperhouse/displaywidth v0.9.0 // indirect
 	github.com/clipperhouse/stringish v0.1.1 // indirect
 	github.com/clipperhouse/uax29/v2 v2.5.0 // indirect
-	github.com/dlclark/regexp2/v2 v2.2.1 // indirect
-	github.com/dop251/goja v0.0.0-20260603143327-1f200ca63355 // indirect
+	github.com/dlclark/regexp2/v2 v2.5.2 // indirect
+	github.com/dop251/goja v0.0.0-20260806115107-493f22071ef6 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/expr-lang/expr v1.17.8 // indirect
+	github.com/fragshq/fml v0.3.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
 	github.com/getkin/kin-openapi v0.135.0 // indirect
@@ -141,3 +139,9 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
+
+replace github.com/fragshq/frags v1.0.0-rc5 => ../
+replace	github.com/fragshq/frags/anthropic v1.0.0-rc3 => ../anthropic
+replace	github.com/fragshq/frags/chatgpt v1.0.0-rc3 => ../chatgpt
+replace	github.com/fragshq/frags/gemini v1.0.0-rc1 => ../gemini
+replace	github.com/fragshq/frags/ollama v1.0.0-rc0 => ../ollama

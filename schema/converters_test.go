@@ -19,9 +19,9 @@ package schema
 import (
 	"testing"
 
+	"github.com/fragshq/frags/util"
 	"github.com/jinzhu/copier"
 	"github.com/stretchr/testify/assert"
-	"github.com/theirish81/frags/util"
 )
 
 func TestFromAny_MapstructureTypeArray(t *testing.T) {

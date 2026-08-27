@@ -11,8 +11,8 @@ jobs:
     permissions:
       contents: write
     env:
-      GOPRIVATE: "*github.com/theirish81/*"
-      GONOSUMDB: "github.com/theirish81/*"
+      GOPRIVATE: "*github.com/fragshq/*"
+      GONOSUMDB: "github.com/fragshq/*"
       GOFLAGS: "-mod=mod"
     steps:
       - uses: actions/checkout@v3

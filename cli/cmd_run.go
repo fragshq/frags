@@ -27,11 +27,11 @@ import (
 
 	"github.com/alecthomas/chroma/v2/quick"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/util"
 	"github.com/mattn/go-isatty"
 	"github.com/spf13/cobra"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/util"
 )
 
 var runCmd = &cobra.Command{

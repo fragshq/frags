@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/theirish81/frags/mcpauth"
+	"github.com/fragshq/frags/mcpauth"
 )
 
 // ToolsConfig defines the configuration for the MCP clients and collections. This serves no specific purpose

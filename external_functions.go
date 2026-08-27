@@ -21,9 +21,9 @@ import (
 	"fmt"
 	"maps"
 
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/schema"
-	"github.com/theirish81/frags/util"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/schema"
+	"github.com/fragshq/frags/util"
 )
 
 // ExternalFunction represents a function that can be called by the AI model.

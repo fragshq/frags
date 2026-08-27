@@ -20,7 +20,7 @@ package anthropic
 import (
 	"encoding/json"
 
-	"github.com/theirish81/frags/schema"
+	"github.com/fragshq/frags/schema"
 )
 
 // SchemaToClaudeMap converts a Schema to a map[string]any suitable for the Claude API.

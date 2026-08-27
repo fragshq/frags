@@ -18,10 +18,10 @@
 package frags
 
 import (
+	"github.com/fragshq/frags/evaluators"
+	"github.com/fragshq/frags/scoper"
+	"github.com/fragshq/frags/util"
 	"github.com/google/uuid"
-	"github.com/theirish81/frags/evaluators"
-	"github.com/theirish81/frags/scoper"
-	"github.com/theirish81/frags/util"
 )
 
 type FunctionCallDestination string

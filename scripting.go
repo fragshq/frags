@@ -17,7 +17,7 @@
 
 package frags
 
-import "github.com/theirish81/frags/util"
+import "github.com/fragshq/frags/util"
 
 // ScriptEngine is the interface that wraps the RunCode method. Frags provides NO script engines, it's the program
 // that includes Frags that provides one, if necessary. Beware though, most script engines pose a security risk.

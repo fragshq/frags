@@ -27,14 +27,14 @@ import (
 	"time"
 
 	"github.com/avast/retry-go/v5"
+	"github.com/fragshq/frags/evaluators"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/schema"
+	"github.com/fragshq/frags/scoper"
+	"github.com/fragshq/frags/util"
+	"github.com/fragshq/zealql"
 	"github.com/go-playground/validator/v10"
-	"github.com/theirish81/frags/evaluators"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/schema"
-	"github.com/theirish81/frags/scoper"
-	"github.com/theirish81/frags/util"
-	"github.com/theirish81/zealql"
 )
 
 type ExportableRunner interface {

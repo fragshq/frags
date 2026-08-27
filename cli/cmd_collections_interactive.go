@@ -23,7 +23,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/theirish81/frags"
+	"github.com/fragshq/frags"
 	"github.com/theirish81/tui"
 )
 

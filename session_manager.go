@@ -22,9 +22,9 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/theirish81/frags/evaluators"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/schema"
+	"github.com/fragshq/frags/evaluators"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/schema"
 	"gopkg.in/yaml.v3"
 )
 

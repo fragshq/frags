@@ -21,15 +21,15 @@ import (
 	"os"
 	"strings"
 
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/evaluators"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/scriptengines"
+	"github.com/fragshq/frags/util"
+	"github.com/fragshq/fragsfunctions/data"
+	"github.com/fragshq/zealql"
 	"github.com/samber/lo"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/evaluators"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/scriptengines"
-	"github.com/theirish81/frags/util"
-	"github.com/theirish81/fragsfunctions/data"
-	"github.com/theirish81/zealql"
 )
 
 // execute executes the plan using the specified parameters

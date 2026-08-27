@@ -26,12 +26,12 @@ import (
 	"cloud.google.com/go/auth/credentials"
 	anthropicSdk "github.com/anthropics/anthropic-sdk-go"
 	"github.com/anthropics/anthropic-sdk-go/option"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/anthropic"
-	"github.com/theirish81/frags/chatgpt"
-	"github.com/theirish81/frags/gemini"
-	"github.com/theirish81/frags/ollama"
-	"github.com/theirish81/frags/util"
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/anthropic"
+	"github.com/fragshq/frags/chatgpt"
+	"github.com/fragshq/frags/gemini"
+	"github.com/fragshq/frags/ollama"
+	"github.com/fragshq/frags/util"
 	"google.golang.org/genai"
 )
 
@@ -113,6 +113,7 @@ func newGeminiClient() (*genai.Client, error) {
 }
 
 func newAnthropicClient() *anthropicSdk.Client {
-	client := anthropicSdk.NewClient(option.WithAPIKey(cfg.AnthropicApiKey))
+	//client := anthropicSdk.NewClient(option.WithAPIKey(cfg.AnthropicApiKey))
+	client := anthropicSdk.NewClient(option.WithAuthToken(cfg.AnthropicApiKey), option.WithBaseURL("https://app.barndoor.ai/api/llm-gateway"))
 	return &client
 }

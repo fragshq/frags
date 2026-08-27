@@ -20,10 +20,10 @@ package frags
 import (
 	"testing"
 
+	"github.com/fragshq/frags/evaluators"
+	"github.com/fragshq/frags/schema"
 	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
-	"github.com/theirish81/frags/evaluators"
-	"github.com/theirish81/frags/schema"
 	yaml2 "gopkg.in/yaml.v3"
 )
 

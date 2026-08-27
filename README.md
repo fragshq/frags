@@ -47,4 +47,4 @@ Frags comes as a **CLI tool** and as a **library to be integrated into Golang pr
 * **Creative writing:** Frags can be used to generate creative content, allowing you to design how your writing should
   look like, and how it should be structured.
 
-## Find the full documentation in the [Frags Wiki](https://github.com/theirish81/frags/wiki)
+## Find the full documentation in the [Frags Wiki](https://github.com/fragshq/frags/wiki)

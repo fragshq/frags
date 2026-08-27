@@ -23,7 +23,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/theirish81/frags/util"
+	"github.com/fragshq/frags/util"
 )
 
 type ValidationError struct {

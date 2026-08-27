@@ -20,8 +20,8 @@ import (
 	"encoding/json"
 	"testing"
 
+	"github.com/fragshq/frags/util"
 	"github.com/stretchr/testify/assert"
-	"github.com/theirish81/frags/util"
 	"gopkg.in/yaml.v3"
 )
 

@@ -24,9 +24,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fragshq/frags/resources"
+	"github.com/fragshq/frags/util"
 	"github.com/stretchr/testify/assert"
-	"github.com/theirish81/frags/resources"
-	"github.com/theirish81/frags/util"
 )
 
 func TestRunner_Run(t *testing.T) {

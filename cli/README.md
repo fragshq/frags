@@ -1,6 +1,6 @@
 # Frags CLI
 
-A command-line interface for [Frags](https://github.com/theirish81/frags) to:
+A command-line interface for [Frags](https://github.com/fragshq/frags) to:
 * process session files using AI models from Google Gemini, Ollama or ChatGPT.
 * render YAML or JSON data files using a Go template..
 * print the current configuration.

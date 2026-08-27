@@ -21,7 +21,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/theirish81/frags/evaluators"
+	"github.com/fragshq/frags/evaluators"
 	"gopkg.in/yaml.v3"
 )
 

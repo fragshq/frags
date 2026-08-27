@@ -22,9 +22,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/util"
 	"github.com/stretchr/testify/assert"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/util"
 )
 
 func TestTransformer_Transform(t *testing.T) {

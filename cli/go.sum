@@ -6,8 +6,8 @@ cloud.google.com/go/auth v0.9.3/go.mod h1:7z6VY+7h3KUdRov5F1i8NDP5ZzWKYmEPO842Bg
 cloud.google.com/go/compute/metadata v0.5.0 h1:Zr0eK8JbFv6+Wi4ilXAR8FJ3wyNdpxHKJNPos6LTZOY=
 cloud.google.com/go/compute/metadata v0.5.0/go.mod h1:aHnloV2TPI38yx4s9+wAZhHykWvVCfu7hQbF+9CWoiY=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
-github.com/Masterminds/semver/v3 v3.2.1 h1:RN9w6+7QoMeJVGyfmbcgs28Br8cvmnucEXnY0rYXWg0=
-github.com/Masterminds/semver/v3 v3.2.1/go.mod h1:qvl/7zhW3nngYb5+80sSMF+FG2BjYrf8m9wsX0PNOMQ=
+github.com/Masterminds/semver/v3 v3.5.0 h1:kQceYJfbupGfZOKZQg0kou0DgAKhzDg2NZPAwZ/2OOE=
+github.com/Masterminds/semver/v3 v3.5.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/alecthomas/assert/v2 v2.11.0 h1:2Q9r3ki8+JYXvGsDyBXwH3LcJ+WK5D0gc5E8vS6K3D0=
 github.com/alecthomas/assert/v2 v2.11.0/go.mod h1:Bze95FyfUr7x34QZrjL+XP+0qgp/zg8yS+TtBj1WA3k=
 github.com/alecthomas/chroma/v2 v2.27.0 h1:FodwmyOBgJULFYmDqibcp9pvfDLWdtPRh9v/r5BXYZs=
@@ -57,12 +57,12 @@ github.com/cpuguy83/go-md2man/v2 v2.0.6/go.mod h1:oOW0eioCTA6cOiMLiUPZOpcVxMig6N
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
-github.com/dlclark/regexp2/v2 v2.2.1 h1:mf4KkFUj0gJuarK8P+LgiS+Lit7m9N1yAwEfPbee7R0=
-github.com/dlclark/regexp2/v2 v2.2.1/go.mod h1:avUrQvPaLz2DrFNHJF0taWAFFX2C1GMSSoeiqFjcBmU=
+github.com/dlclark/regexp2/v2 v2.5.2 h1:HAsucWRhsqcDzl6Ua9aR8JwYOTzrZyPrF0/FNxJVAI0=
+github.com/dlclark/regexp2/v2 v2.5.2/go.mod h1:avUrQvPaLz2DrFNHJF0taWAFFX2C1GMSSoeiqFjcBmU=
 github.com/dnaeon/go-vcr v1.2.0 h1:zHCHvJYTMh1N7xnV7zf1m1GPBF9Ad0Jk/whtQ1663qI=
 github.com/dnaeon/go-vcr v1.2.0/go.mod h1:R4UdLID7HZT3taECzJs4YgbbH6PIGXB6W/sc5OLb6RQ=
-github.com/dop251/goja v0.0.0-20260603143327-1f200ca63355 h1:QCZbLvvKw3vwkMubwAHHBIecVHyLGfyty0yf5+cx5As=
-github.com/dop251/goja v0.0.0-20260603143327-1f200ca63355/go.mod h1:YkABBhNI1qP6/NuyyPL5QqJ4L28ax4m+WAywAWr9fJk=
+github.com/dop251/goja v0.0.0-20260806115107-493f22071ef6 h1:Oh2rRG1un7tLlC3/NJDzKppZ4CeZGkVFJCUOTRwLpfw=
+github.com/dop251/goja v0.0.0-20260806115107-493f22071ef6/go.mod h1:LiIEzozrcvNXorsG/3+ypGqdTUAqZryhzSsqi0oU/Qg=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/envoyproxy/go-control-plane v0.9.0/go.mod h1:YTl/9mNaCwkRvm6d1a2C3ymFceY/DCBVvsKhRF0iEA4=
@@ -73,6 +73,8 @@ github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f h1:Y/CXytFA4m6
 github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f/go.mod h1:vw97MGsxSvLiUE2X8qFplwetxpGLQrlU1Q9AUEIzCaM=
 github.com/expr-lang/expr v1.17.8 h1:W1loDTT+0PQf5YteHSTpju2qfUfNoBt4yw9+wOEU9VM=
 github.com/expr-lang/expr v1.17.8/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
+github.com/fragshq/fml v0.3.0 h1:2ItC+DhU1Ei2rgUKUcTp/YEm1n9BnGJc26v7hPe7Zy0=
+github.com/fragshq/fml v0.3.0/go.mod h1:Wh+s342/wT3lwlFcNW18mRvDhzmIzOVsgFG5Ne+efpU=
 github.com/frankban/quicktest v1.14.6 h1:7Xjx+VpznH+oBnejlPUj8oUpdxnVs4f8XU8WnHkI4W8=
 github.com/frankban/quicktest v1.14.6/go.mod h1:4ptaffx2x8+WTWXmUCuVU6aPUX1/Mz7zb5vbUoiM6w0=
 github.com/fsnotify/fsnotify v1.9.0 h1:2Ml+OJNzbYCTzsxtv8vKSFD9PbJjmhYF14k/jKC7S9k=
@@ -184,8 +186,8 @@ github.com/mattn/go-localereader v0.0.1 h1:ygSAOl7ZXTx4RdPYinUpg6W99U8jWvWi9Ye2J
 github.com/mattn/go-localereader v0.0.1/go.mod h1:8fBrzywKY7BI3czFoHkuzRoWE9C+EiG4R1k4Cjx5p88=
 github.com/mattn/go-runewidth v0.0.19 h1:v++JhqYnZuu5jSKrk9RbgF5v4CGUjqRfBm05byFGLdw=
 github.com/mattn/go-runewidth v0.0.19/go.mod h1:XBkDxAl56ILZc9knddidhrOlY5R/pDhgLpndooCuJAs=
-github.com/modelcontextprotocol/go-sdk v1.6.0 h1:PPLS3kn7WtOEnR+Af4X5H96SG0qSab8R/ZQT/HkhPkY=
-github.com/modelcontextprotocol/go-sdk v1.6.0/go.mod h1:kzm3kzFL1/+AziGOE0nUs3gvPoNxMCvkxokMkuFapXQ=
+github.com/modelcontextprotocol/go-sdk v1.7.0 h1:yqjY2dsbKAC0LSuWZVBMrHgiG8ukXv6NRo0JiALay44=
+github.com/modelcontextprotocol/go-sdk v1.7.0/go.mod h1:dL7u98E/zjJTGzEq+j30jQ8K2k1mb6LeAH4inEcSGts=
 github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 h1:RWengNIwukTxcDr9M+97sNutRR1RKhG96O6jWumTTnw=
 github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826/go.mod h1:TaXosZuwdSHYgviHp1DAtfrULt5eUgsSMsZf+YrPgl8=
 github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6 h1:ZK8zHtRHOkbHy6Mmr5D264iyp3TiX5OmNcI5cIARiQI=
@@ -259,7 +261,6 @@ github.com/theirish81/doauth v0.0.0-20260728113914-6d4bef51ad6e h1:P/adRPXvenYYu
 github.com/theirish81/doauth v0.0.0-20260728113914-6d4bef51ad6e/go.mod h1:njnhj5eJQ+3Kxe4PDiJL5gTHJkWa3TfBOmtZ3X5a7/E=
 github.com/theirish81/fml v0.2.0 h1:ZBr23PyWVMf6UNvuRCe1IqmA1TMrbBF0ThLmjkh8Ek0=
 github.com/theirish81/fml v0.2.0/go.mod h1:H73S0GEeH7bV1xrsKeY4/NuRzNBtgVGPxzuwZ/3JyuU=
-github.com/theirish81/frags v1.0.0-rc5 h1:B8pL6ZN7l6vAF7i6VJL+2drQgwYWYmDcMe2r/QG8jks=
 github.com/theirish81/frags v1.0.0-rc5/go.mod h1:QOuN7oJNMyFoXuLTnvLhV9xfZxlhWRNmwLkOQraIBe4=
 github.com/theirish81/frags/anthropic v1.0.0-rc3 h1:7APTAk4JvMyZB/6/8R30QnABJRTufiC1fHejcsyZL2E=
 github.com/theirish81/frags/anthropic v1.0.0-rc3/go.mod h1:sbvYVu2B4yYv7QssKKzvP8/nYdEUMk5kaQPY42atlEU=
@@ -283,8 +284,8 @@ github.com/theirish81/sesat2 v0.0.0-20260511100810-8e377902d6c0 h1:7WtbR4i3PTSyv
 github.com/theirish81/sesat2 v0.0.0-20260511100810-8e377902d6c0/go.mod h1:R/UhIVwVe6v+F1Dg3hfVOdPijkxJfksy1GiBire4JiM=
 github.com/theirish81/tui v0.0.0-20260802093906-22154f4c09c8 h1:aazFb/9UCoYlsDrLCtncEqBwWOi5gqIg1bdgWN0CwvI=
 github.com/theirish81/tui v0.0.0-20260802093906-22154f4c09c8/go.mod h1:hfTFNT2jLbpNS65NSYRvqrX1kW2hkgBdj98GOpQ408c=
-github.com/theirish81/zealql v0.0.0-20260513085909-eb2e76a09b48 h1:E5Nm4CdfD9ReYZum1ARa1AMg+kTpLiYt1FWUaBjRCk4=
-github.com/theirish81/zealql v0.0.0-20260513085909-eb2e76a09b48/go.mod h1:uHiuOu/XnDY5Cuy+i07WlvRUfVaYvbGWUsnHUIH3NjU=
+github.com/theirish81/zealql v0.0.0-20260731072305-439bd89b6fc2 h1:9CrsLTdewd5Lc5U3/clY5xbxd6p/SsJoRcaVEIcJUl4=
+github.com/theirish81/zealql v0.0.0-20260731072305-439bd89b6fc2/go.mod h1:uHiuOu/XnDY5Cuy+i07WlvRUfVaYvbGWUsnHUIH3NjU=
 github.com/tidwall/gjson v1.14.2/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=
 github.com/tidwall/gjson v1.18.0 h1:FIDeeyB800efLX89e5a8Y0BNH+LOngJyGrIWxG2FKQY=
 github.com/tidwall/gjson v1.18.0/go.mod h1:/wbyibRr2FHMks5tjHJ5F8dMZh3AcwJEMf5vlfC0lxk=

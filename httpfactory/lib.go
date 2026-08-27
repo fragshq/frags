@@ -21,7 +21,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/theirish81/sesat2"
+	"github.com/fragshq/sesat2"
 )
 
 type Factory interface {

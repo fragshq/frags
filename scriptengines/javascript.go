@@ -21,8 +21,8 @@ import (
 	"time"
 
 	"github.com/dop251/goja"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/util"
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/util"
 )
 
 type JavascriptScriptingEngine struct {

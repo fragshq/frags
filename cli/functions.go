@@ -25,15 +25,15 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/theirish81/apicp"
-	apiCpCollection "github.com/theirish81/apicp/collection"
-	"github.com/theirish81/frags"
-	"github.com/theirish81/frags/log"
-	"github.com/theirish81/frags/mcpauth"
-	"github.com/theirish81/fragsfunctions/fs"
-	"github.com/theirish81/fragsfunctions/http"
-	"github.com/theirish81/fragsfunctions/postgres"
-	"github.com/theirish81/sesat2"
+	"github.com/fragshq/apicp"
+	apiCpCollection "github.com/fragshq/apicp/collection"
+	"github.com/fragshq/frags"
+	"github.com/fragshq/frags/log"
+	"github.com/fragshq/frags/mcpauth"
+	"github.com/fragshq/fragsfunctions/fs"
+	"github.com/fragshq/fragsfunctions/http"
+	"github.com/fragshq/fragsfunctions/postgres"
+	"github.com/fragshq/sesat2"
 )
 
 var (
