@@ -1,0 +1,53 @@
+version: 2
+
+project_name: frags
+
+before:
+  hooks:
+    - go -C cli mod tidy
+
+builds:
+  - id: frags
+    binary: frags
+    dir: cli   # Working directory containing the CLI's go.mod
+    main: .    # Relative to dir
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+      - linux
+      - windows
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - formats:
+      - tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        formats:
+          - zip
+
+brews:
+  - name: frags
+    homepage: "https://github.com/fragshq/frags"
+    description: "FRAGS CLI"
+    license: "AGPL"
+    repository:
+      owner: fragshq
+      name: homebrew-tools
+      branch: main
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
+
+scoops:
+  - name: frags
+    homepage: "https://github.com/fragshq/frags"
+    description: "FRAGS CLI"
+    license: "AGPL"
+    repository:
+      owner: fragshq
+      name: scoop-bucket
+      branch: main
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"
