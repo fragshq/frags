@@ -60,11 +60,13 @@ func NewResponseRequest(model string, input []Message, instructions string, tool
 		Instructions: instructions,
 	}
 	if schema != nil {
+		sx := SchemaToChatGPTMap(schema)
 		req.Text = &Text{
 			Format: &ResponseFormat{
 				Name:   "response",
 				Type:   PartTypeJsonSchema,
-				Schema: schema,
+				Schema: sx,
+				Strict: true,
 			},
 		}
 	}
