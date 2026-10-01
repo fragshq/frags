@@ -30,6 +30,9 @@ archives:
         formats:
           - zip
 
+checksum:
+  name_template: "{{ .ProjectName }}_{{ trimprefix .Tag \"cli/\" }}_checksums.txt"
+
 brews:
   - name: frags
     homepage: "https://github.com/fragshq/frags"
