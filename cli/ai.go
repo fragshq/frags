@@ -113,7 +113,6 @@ func newGeminiClient() (*genai.Client, error) {
 }
 
 func newAnthropicClient() *anthropicSdk.Client {
-	//client := anthropicSdk.NewClient(option.WithAPIKey(cfg.AnthropicApiKey))
-	client := anthropicSdk.NewClient(option.WithAuthToken(cfg.AnthropicApiKey), option.WithBaseURL("https://app.barndoor.ai/api/llm-gateway"))
+	client := anthropicSdk.NewClient(option.WithAPIKey(cfg.AnthropicApiKey))
 	return &client
 }
