@@ -81,10 +81,13 @@ github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a h1:zVZCGCpPtNogxtKw
 github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a/go.mod h1:DYhYU5v/g45OZaPeMGebSaqk0cHJ9LJIdbNAQ5arOms=
 github.com/fragshq/fml v0.3.0 h1:2ItC+DhU1Ei2rgUKUcTp/YEm1n9BnGJc26v7hPe7Zy0=
 github.com/fragshq/fml v0.3.0/go.mod h1:Wh+s342/wT3lwlFcNW18mRvDhzmIzOVsgFG5Ne+efpU=
+github.com/fragshq/frags v1.0.0-rc7 h1:r8LAw+zP16R1u5T3/KembFexuzps49c4z4jvn7nJOQw=
 github.com/fragshq/frags v1.0.0-rc7/go.mod h1:UpgUTZLNGzf76FQt6xM5qQXIs2/QATWvV5WWQoO7vME=
-github.com/fragshq/frags/anthropic v1.0.0-rc5/go.mod h1:ULVDwJBxFM/SnJgqSUcXgnve75wQ7BhQe4FctFoKWAM=
+github.com/fragshq/frags/anthropic v1.0.0-rc6 h1:YZOt/rLjwg4I0HQCjb0dC0DgdxqrCfELVKuM6zierxQ=
 github.com/fragshq/frags/anthropic v1.0.0-rc6/go.mod h1:ULVDwJBxFM/SnJgqSUcXgnve75wQ7BhQe4FctFoKWAM=
+github.com/fragshq/frags/chatgpt v1.0.0-rc6 h1:ffkOpaV1dYa6HtwWMvr2w+421iiZ732iG05evoqZyY4=
 github.com/fragshq/frags/chatgpt v1.0.0-rc6/go.mod h1:FYunEXXGKAb/FDRM9DL8uphBfglpMKBQLTHIv3O8sEE=
+github.com/fragshq/frags/gemini v1.0.0-rc3 h1:xjw5O6L+XXzftffE/tM4BSElvCHMViKm9T7lu6DAvTY=
 github.com/fragshq/frags/gemini v1.0.0-rc3/go.mod h1:hzLI1//d1mWKMph693I4yItv9nV5q7f7khYW8pngZ98=
 github.com/fragshq/frags/ollama v1.0.0-rc1 h1:1FNecSjWl+JLDUqLiDrHHmr/GzfF36FCgFn06ey1XUs=
 github.com/fragshq/frags/ollama v1.0.0-rc1/go.mod h1:EnIGhx2vTafCuOc/LuqMtVMMCWfwc6Qz490AdHt8jh4=
