@@ -26,7 +26,7 @@ import (
 )
 
 // contextualizePrompt adds the current context to the prompt. This includes the already extracted context, if enabled,
-// and optional pre-calls which will be called in this function.
+// and optional pre-calls context
 func (r *Runner) contextualizePrompt(prompt string, preCallContext *scoper.KnowledgeNode, session Session, scope evaluators.EvalScope) (string, error) {
 	var contextData *scoper.KnowledgeNode
 	if session.Context != nil && (session.Context.IsTrue() || session.Context.HasTemplate()) {

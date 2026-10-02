@@ -98,6 +98,16 @@ func (d *Ai) New() frags.Ai {
 
 func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools frags.ToolDefinitions,
 	runner frags.ExportableRunner, rx ...resources.ResourceData) ([]byte, error) {
+	if len(text) == 0 {
+		if sx == nil && len(d.content) > 0 {
+			var sb strings.Builder
+			for _, part := range d.content.Last().Content {
+				sb.WriteString(part.Text)
+			}
+			return []byte(sb.String()), nil
+		}
+		return nil, nil
+	}
 
 	chatGptTools, err := d.configureTools(tools)
 	if err != nil {

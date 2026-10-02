@@ -108,15 +108,18 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	blocks = append(blocks, anthropic.NewTextBlock(text))
 	newMsg := anthropic.NewUserMessage(blocks...)
 
-	if text == "" && sx == nil && len(d.content) > 0 {
-		lastMsg := d.content[len(d.content)-1]
-		out := ""
-		for _, block := range lastMsg.Content {
-			if block.OfText != nil {
-				out += block.OfText.Text
+	if text == "" {
+		if sx == nil && len(d.content) > 0 {
+			lastMsg := d.content[len(d.content)-1]
+			var sb strings.Builder
+			for _, block := range lastMsg.Content {
+				if block.OfText != nil {
+					sb.WriteString(block.OfText.Text)
+				}
 			}
+			return []byte(sb.String()), nil
 		}
-		return []byte(out), nil
+		return nil, nil
 	}
 
 	tx, err := d.configureTools(tools)
