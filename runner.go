@@ -465,9 +465,14 @@ func (r *Runner) runPrompt(ctx *util.FragsContext, ai Ai, sessionID string, sess
 				WithIteration(iteratorIdx).WithErr(ctx.Err()))
 			return ctx.Err()
 		}
-		r.logger.Info(log.NewEvent(log.StartEventType, log.PromptComponent).WithSession(sessionID).
-			WithIteration(iteratorIdx))
+
 		var data []byte
+		logItem := log.NewEvent(log.StartEventType, log.PromptComponent).WithSession(sessionID).
+			WithIteration(iteratorIdx)
+		if len(session.Prompt) == 0 {
+			logItem = logItem.WithMessage("empty")
+		}
+		r.logger.Info(logItem)
 		prompt, err := session.RenderPrompt(scope)
 		if err != nil {
 			r.logger.Err(log.NewEvent(log.ErrorEventType, log.PromptComponent).
@@ -478,12 +483,16 @@ func (r *Runner) runPrompt(ctx *util.FragsContext, ai Ai, sessionID string, sess
 		// as this is the first phase, and there was no prePrompt, we contextualize the prompt with Frags
 		// context or preCalls, if so configured.
 		if !session.HasPrePrompt() {
-			prompt, err = r.contextualizePrompt(prompt, aiContext, session, scope)
-			if err != nil {
-				r.logger.Err(log.NewEvent(log.ErrorEventType, log.PromptComponent).
-					WithMessage("failed to contextualize prompt").WithErr(err).WithSession(sessionID).
-					WithIteration(iteratorIdx))
-				return err
+			// we won't run contextualization on the prompt if the prompt is empty. This will allow the LLM to skip
+			// the prompt execution entirely.
+			if len(prompt) > 0 {
+				prompt, err = r.contextualizePrompt(prompt, aiContext, session, scope)
+				if err != nil {
+					r.logger.Err(log.NewEvent(log.ErrorEventType, log.PromptComponent).
+						WithMessage("failed to contextualize prompt").WithErr(err).WithSession(sessionID).
+						WithIteration(iteratorIdx))
+					return err
+				}
 			}
 		}
 		// finally, we ask the LLM for an answer. Notice we pass NO TOOLS, as only  the prePrompt is allowed
@@ -498,18 +507,22 @@ func (r *Runner) runPrompt(ctx *util.FragsContext, ai Ai, sessionID string, sess
 		// we don't want subsequent phases to load them again.
 		promptResources = make(resources.ResourceDataItems, 0)
 		if sessionSchema != nil {
-			// regardless data is returned and is ideally structured, considering a schema.
-			// was provided. We can unmarshal it in the runner data structure.
-			if err := r.safeUnmarshalDataStructure(data); err != nil {
-				r.logger.Err(log.NewEvent(log.ErrorEventType, log.PromptComponent).WithMessage("failed to unmarshal data").
-					WithErr(err).WithSession(sessionID).WithIteration(iteratorIdx))
-				return err
+			if data != nil {
+				// regardless data is returned and is ideally structured, considering a schema.
+				// was provided. We can unmarshal it in the runner data structure.
+				if err := r.safeUnmarshalDataStructure(data); err != nil {
+					r.logger.Err(log.NewEvent(log.ErrorEventType, log.PromptComponent).WithMessage("failed to unmarshal data").
+						WithErr(err).WithSession(sessionID).WithIteration(iteratorIdx))
+					return err
+				}
 			}
 		} else {
-			// however, if the schema was not provided, we are in the "subagent" mode and data is just plain
-			// text. So we are going to add that data to the output in an array of text
-			if err := r.safeMergeDataStructure(map[string]any{sessionID: []any{string(data)}}); err != nil {
-				return err
+			if data != nil {
+				// however, if the schema was not provided, we are in the "subagent" mode and data is just plain
+				// text. So we are going to add that data to the output in an array of text
+				if err := r.safeMergeDataStructure(map[string]any{sessionID: []any{string(data)}}); err != nil {
+					return err
+				}
 			}
 		}
 		r.logger.Info(log.NewEvent(log.EndEventType, log.PromptComponent).WithSession(sessionID).
