@@ -11,10 +11,10 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/fragshq/apicp v0.0.0-20260827121856-c90024f9227a
 	github.com/fragshq/fml v0.3.0
-	github.com/fragshq/frags v1.0.0-rc6
-	github.com/fragshq/frags/anthropic v1.0.0-rc5
-	github.com/fragshq/frags/chatgpt v1.0.0-rc4
-	github.com/fragshq/frags/gemini v1.0.0-rc2
+	github.com/fragshq/frags v1.0.0-rc7
+	github.com/fragshq/frags/anthropic v1.0.0-rc6
+	github.com/fragshq/frags/chatgpt v1.0.0-rc6
+	github.com/fragshq/frags/gemini v1.0.0-rc3
 	github.com/fragshq/frags/ollama v1.0.0-rc1
 	github.com/fragshq/fragsfunctions/data v0.8.0
 	github.com/fragshq/fragsfunctions/fs v0.9.0
@@ -23,7 +23,7 @@ require (
 	github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381
 	github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44
 	github.com/google/jsonschema-go v0.4.3
-	github.com/labstack/echo/v4 v4.15.2
+	github.com/labstack/echo/v4 v4.16.0
 	github.com/mattn/go-isatty v0.0.22
 	github.com/modelcontextprotocol/go-sdk v1.7.0
 	github.com/samber/lo v1.53.0
@@ -86,7 +86,7 @@ require (
 	github.com/labstack/gommon v0.5.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
-	github.com/mattn/go-colorable v0.1.14 // indirect
+	github.com/mattn/go-colorable v0.1.15 // indirect
 	github.com/mattn/go-localereader v0.0.1 // indirect
 	github.com/mattn/go-runewidth v0.0.19 // indirect
 	github.com/muesli/ansi v0.0.0-20230316100256-276c6243b2f6 // indirect
@@ -121,12 +121,12 @@ require (
 	go.opencensus.io v0.24.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.2 // indirect
-	golang.org/x/crypto v0.52.0 // indirect
-	golang.org/x/net v0.54.0 // indirect
+	golang.org/x/crypto v0.53.0 // indirect
+	golang.org/x/net v0.56.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.45.0 // indirect
-	golang.org/x/text v0.37.0 // indirect
+	golang.org/x/sync v0.22.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/text v0.40.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	google.golang.org/api v0.197.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240903143218-8af14fe29dc1 // indirect
