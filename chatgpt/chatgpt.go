@@ -106,7 +106,6 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 			}
 			return []byte(sb.String()), nil
 		}
-		// TODO check if this decision is dangerous
 		return nil, nil
 	}
 
