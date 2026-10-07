@@ -392,6 +392,12 @@ func (p *OAuthProvider) updateEndpoints(resources *doauth.Metadata) {
 	if p.cfg.TokenURL == "" {
 		p.cfg.TokenURL = resources.TokenURL
 	}
+	// When no scopes were configured, request the ones the resource points at (challenge, then
+	// resource metadata). Some authorization servers (e.g. Slack) reject authorization requests
+	// without a scope; if their resource doesn't advertise any, configure Scopes explicitly.
+	if len(p.cfg.Scopes) == 0 {
+		p.cfg.Scopes = resources.DefaultScopes()
+	}
 }
 
 // ─── NopOauthAuthProvider ────────────────────────────────────────────────────
