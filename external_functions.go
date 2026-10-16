@@ -56,7 +56,7 @@ func (f ExternalFunction) Run(ctx *util.FragsContext, args map[string]any, runne
 	runner.Logger().Debug(log.NewEvent(log.StartEventType, log.FunctionComponent).WithFunction(fmt.Sprintf("%s(%v)", f.Name, ax)))
 	out, err := f.Func(ctx, ax.(map[string]any))
 	if err != nil {
-		return nil, err
+		return out, err
 	}
 
 	out, err = runner.Transformers().FilterOnFunctionOutput(f.Name).Transform(ctx, out, runner)

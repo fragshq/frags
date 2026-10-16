@@ -20,6 +20,7 @@ package frags
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"log/slog"
 	"net/http"
 	"os"
@@ -237,11 +238,15 @@ func (c *McpTool) Run(ctx *util.FragsContext, name string, arguments any) (any, 
 	if err != nil {
 		return nil, err
 	}
+	err = nil
+	if res.IsError {
+		err = errors.New("business logic error")
+	}
 	if res.StructuredContent != nil {
-		return res.StructuredContent, nil
+		return res.StructuredContent, err
 	}
 
-	return convertContentArray(res.Content), nil
+	return convertContentArray(res.Content), err
 }
 
 // Close closes the connection to the server
