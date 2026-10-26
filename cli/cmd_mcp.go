@@ -27,7 +27,7 @@ import (
 var mcpCmd = &cobra.Command{
 	Use:   "mcp",
 	Short: "Manage MCP servers",
-	Long:  `Manage MCP servers. Use "edit" to edit MCP configurations interactively.`,
+	Long:  `Manage MCP servers. Use "edit" to edit MCP configurations interactively, or "register" to register an OAuth client via Dynamic Client Registration.`,
 }
 
 var mcpViewCmd = &cobra.Command{
@@ -64,4 +64,5 @@ var mcpEditCmd = &cobra.Command{
 func init() {
 	mcpCmd.AddCommand(mcpEditCmd)
 	mcpCmd.AddCommand(mcpViewCmd)
+	mcpCmd.AddCommand(mcpRegisterCmd)
 }

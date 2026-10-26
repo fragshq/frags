@@ -7,7 +7,7 @@ require (
 	github.com/blues/jsonata-go v1.5.4
 	github.com/dop251/goja v0.0.0-20260806115107-493f22071ef6
 	github.com/expr-lang/expr v1.17.8
-	github.com/fragshq/doauth v0.0.0-20261007072203-2f5a7f7573de
+	github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386
 	github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381
 	github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44
 	github.com/go-playground/validator/v10 v10.30.3
