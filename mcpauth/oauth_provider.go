@@ -46,11 +46,13 @@ type OAuthProviderConfig struct {
 	HTTPClient *http.Client
 }
 
+// DefaultRedirectURL is the local callback URL for the frags CLI and local tools.
+const DefaultRedirectURL = "http://localhost:9999/callback"
+
 // ensureDefaults populates missing configuration fields with sensible default values.
 func (c *OAuthProviderConfig) ensureDefaults() {
 	if c.RedirectURL == "" {
-		// Default local callback URL for the frags CLI and local tools.
-		c.RedirectURL = "http://localhost:9999/callback"
+		c.RedirectURL = DefaultRedirectURL
 	}
 	if c.ClientID == "" {
 		// Default client ID identifying frags to the authorization server.

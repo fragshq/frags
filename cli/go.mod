@@ -9,9 +9,10 @@ require (
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
-	github.com/fragshq/apicp v0.0.0-20260827121856-c90024f9227a
-	github.com/fragshq/fml v0.3.0
-	github.com/fragshq/frags v1.0.0-rc7
+	github.com/fragshq/apicp v0.0.0-20261026141544-2393339ddd38
+	github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386
+	github.com/fragshq/fml v0.3.1
+	github.com/fragshq/frags v1.0.0-rc8-dev2
 	github.com/fragshq/frags/anthropic v1.0.0-rc6
 	github.com/fragshq/frags/chatgpt v1.0.0-rc6
 	github.com/fragshq/frags/gemini v1.0.0-rc3
@@ -56,11 +57,10 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/erikgeiser/coninput v0.0.0-20211004153227-1c3628e74d0f // indirect
 	github.com/expr-lang/expr v1.17.8 // indirect
-	github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a // indirect
 	github.com/fragshq/fragsfunctions v0.7.0 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
-	github.com/getkin/kin-openapi v0.145.0 // indirect
+	github.com/getkin/kin-openapi v0.152.0 // indirect
 	github.com/go-openapi/jsonpointer v0.22.5 // indirect
 	github.com/go-openapi/swag/jsonname v0.25.5 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
@@ -101,7 +101,7 @@ require (
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.11.0 // indirect
-	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3 // indirect
 	github.com/segmentio/asm v1.1.3 // indirect
 	github.com/segmentio/encoding v0.5.4 // indirect
 	github.com/sourcegraph/conc v0.3.1-0.20240121214520-5f936abd7ae8 // indirect
@@ -119,7 +119,7 @@ require (
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	go.yaml.in/yaml/v3 v3.0.4 // indirect
+	go.yaml.in/yaml/v3 v3.0.5 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.2 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
 	golang.org/x/net v0.56.0 // indirect
@@ -137,3 +137,5 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 	modernc.org/sqlite v1.50.1 // indirect
 )
+
+replace github.com/fragshq/frags v1.0.0-rc8-dev2 => ../

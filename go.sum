@@ -15,8 +15,8 @@ github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkp
 github.com/dustin/go-humanize v1.0.1/go.mod h1:Mu1zIs6XwVuF/gI1OepvI0qD18qycQx+mFykh5fBlto=
 github.com/expr-lang/expr v1.17.8 h1:W1loDTT+0PQf5YteHSTpju2qfUfNoBt4yw9+wOEU9VM=
 github.com/expr-lang/expr v1.17.8/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
-github.com/fragshq/doauth v0.0.0-20261007072203-2f5a7f7573de h1:19eravcB8UsKVP0AbNCEZLanDmLSvR8Zl00b1KT9wak=
-github.com/fragshq/doauth v0.0.0-20261007072203-2f5a7f7573de/go.mod h1:DYhYU5v/g45OZaPeMGebSaqk0cHJ9LJIdbNAQ5arOms=
+github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386 h1:Oq9Tn89BMoSYY7m7e1XEubpkB1C4WSsTWYhKuZOycic=
+github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386/go.mod h1:DYhYU5v/g45OZaPeMGebSaqk0cHJ9LJIdbNAQ5arOms=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381 h1:qP4W/vHZmSXwH39YnyB8S5YMMmkeuSsVpSWNJSvxsio=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381/go.mod h1:xrP7R7yiSuv2B4Ij07MFdyq7VlRQSZ8hSQFnvmMQBn8=
 github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44 h1:2BvPv4uXgC1wx0oiiYWDq7Hatbvr2hzQSYUEXqETSEY=
