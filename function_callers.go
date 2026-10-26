@@ -18,6 +18,8 @@
 package frags
 
 import (
+	"encoding/json"
+
 	"github.com/fragshq/frags/evaluators"
 	"github.com/fragshq/frags/scoper"
 	"github.com/fragshq/frags/util"
@@ -49,6 +51,16 @@ type FunctionCaller struct {
 
 type FunctionCallerCallbackFunc func(ctx *util.FragsContext, data map[string]any) (any, error)
 
+type FunctionCallerMcpError struct {
+	originalError error
+	message       any
+}
+
+func (e *FunctionCallerMcpError) Error() string {
+	message, _ := json.Marshal(e.message)
+	return e.originalError.Error() + ": " + string(message)
+}
+
 type FunctionCallers []FunctionCaller
 
 // RunAllFunctionCallers runs all the function calls in the given collection.
@@ -69,7 +81,7 @@ func (r *Runner) RunAllFunctionCallers(ctx *util.FragsContext, fc FunctionCaller
 		var err error
 		value, err := r.runFunctionCaller(ctx, c, inputScope)
 		if err != nil {
-			return nil, err
+			return nil, &FunctionCallerMcpError{originalError: err, message: value}
 		}
 		vx[varName] = value
 		inputScope.WithVars(vx)
