@@ -80,6 +80,12 @@ const (
 	noOpSessionStatus      = SessionStatus("noop")
 )
 
+const (
+	maxIteratorKey     = "__max_iterator"
+	maxIteratorDefault = 15
+	maxIteratorLimit   = 100
+)
+
 // sessionTask is a message to run a session.
 type sessionTask struct {
 	id      string
@@ -167,9 +173,23 @@ func NewRunner(sessionManager SessionManager, resourceLoader resources.ResourceL
 		scriptEngine:      opts.scriptEngine,
 		ExternalFunctions: opts.externalFunctions,
 		ToolsDefinitions:  opts.toolsDefinitions,
-		vars:              make(evaluators.Vars),
+		vars:              initVars(),
 		db:                opts.db,
 	}
+}
+
+func initVars() evaluators.Vars {
+	vars := make(evaluators.Vars)
+	vars[maxIteratorKey] = maxIteratorDefault
+	return vars
+}
+
+func (r *Runner) maxIteratorOK(cnt int) bool {
+	v, _ := r.vars[maxIteratorKey].(int)
+	if v == 0 {
+		v = maxIteratorDefault
+	}
+	return cnt < v && cnt < maxIteratorLimit
 }
 
 // Run runs the runner against an optional collection fo parameters
@@ -343,6 +363,12 @@ func (r *Runner) runSession(ctx *util.FragsContext, sessionID string, session Se
 	}
 
 	for itIdx, it := range iterator {
+		if !r.maxIteratorOK(itIdx) {
+			r.logger.Info(log.NewEvent(log.WarningEventType, log.SessionComponent).
+				WithMessage("iterator limiter triggered").WithSession(sessionID).WithIteration(itIdx))
+			break
+		}
+		r.logger.Info(log.NewEvent(log.InProgressEventType, log.ComputeUnitComponent).WithSession(sessionID).WithIteration(itIdx).WithMessage("compute unit in progress"))
 		// here we're creating a new instance of the AI for this session, so it has no state.
 		ai := r.ai.New()
 
