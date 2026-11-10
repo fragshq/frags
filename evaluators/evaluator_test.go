@@ -20,6 +20,7 @@ package evaluators
 import (
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -151,4 +152,99 @@ func TestEvaluateExpression_Render(t *testing.T) {
 	out, err := EvaluateExpression("render(vars.template, context)", scope)
 	assert.NoError(t, err)
 	assert.Equal(t, "What do we say? come monkey!", out)
+}
+
+func TestTemplate_DateFunctions(t *testing.T) {
+	scope := NewEvalScope()
+	scope["context"] = map[string]any{"ts": "2026-03-28T10:30:00Z"}
+	cases := []struct {
+		tpl  string
+		want string
+	}{
+		{`{{ dateFormat .context.ts "DateOnly" }}`, "2026-03-28"},
+		{`{{ dateFormat .context.ts "DateTime" "Europe/Rome" }}`, "2026-03-28 11:30:00"},
+		{`{{ dateAdd .context.ts "-1d" }}`, "2026-03-27T10:30:00Z"},
+		{`{{ dateFormat (dateAdd .context.ts "1w2h") "DateTime" }}`, "2026-04-04 12:30:00"},
+	}
+	for _, c := range cases {
+		t.Run(c.tpl, func(t *testing.T) {
+			out, err := EvaluateTemplate(c.tpl, scope)
+			assert.NoError(t, err)
+			assert.Equal(t, c.want, out)
+		})
+	}
+	t.Run("now", func(t *testing.T) {
+		out, err := EvaluateTemplate(`{{ now }}`, scope)
+		assert.NoError(t, err)
+		parsed, err := time.Parse(time.RFC3339, out)
+		assert.NoError(t, err)
+		assert.WithinDuration(t, time.Now(), parsed, 2*time.Second)
+
+		out, err = EvaluateTemplate(`{{ dateFormat (dateAdd now "1d") "DateOnly" "UTC" }}`, scope)
+		assert.NoError(t, err)
+		assert.Equal(t, time.Now().UTC().AddDate(0, 0, 1).Format(time.DateOnly), out)
+
+		out, err = EvaluateTemplate(`{{ (now "Europe/Rome").Location }}`, scope)
+		assert.NoError(t, err)
+		assert.Equal(t, "Europe/Rome", out)
+	})
+	t.Run("errors", func(t *testing.T) {
+		for _, tpl := range []string{
+			`{{ now "Mars/Olympus" }}`,
+			`{{ now "UTC" "UTC" }}`,
+			`{{ dateAdd .context.ts "nope" }}`,
+			`{{ dateFormat "garbage" "DateOnly" }}`,
+		} {
+			_, err := EvaluateTemplate(tpl, scope)
+			assert.Error(t, err, tpl)
+		}
+	})
+}
+
+func TestExpression_DateFunctions(t *testing.T) {
+	scope := NewEvalScope()
+	scope["context"] = map[string]any{"ts": "2026-03-28T10:30:00Z"}
+	cases := []struct {
+		expr string
+		want any
+	}{
+		{`dateFormat(context.ts, "DateOnly")`, "2026-03-28"},
+		{`dateFormat(context.ts, "DateTime", "Europe/Rome")`, "2026-03-28 11:30:00"},
+		{`dateFormat(dateAdd(context.ts, "1w2h"), "DateTime")`, "2026-04-04 12:30:00"},
+		{`dateAdd(context.ts, "-1d")`, time.Date(2026, 3, 27, 10, 30, 0, 0, time.UTC)},
+		{`dateAdd(context.ts, "1d") > date("2026-03-28T12:00:00Z")`, true},
+		{`dateAdd(context.ts, "1h") - date("2026-03-28T10:30:00Z")`, time.Hour},
+	}
+	for _, c := range cases {
+		t.Run(c.expr, func(t *testing.T) {
+			out, err := EvaluateExpression(c.expr, scope)
+			assert.NoError(t, err)
+			assert.Equal(t, c.want, out)
+		})
+	}
+	t.Run("now", func(t *testing.T) {
+		out, err := EvaluateExpression(`now()`, scope)
+		assert.NoError(t, err)
+		assert.IsType(t, time.Time{}, out)
+		assert.WithinDuration(t, time.Now(), out.(time.Time), 2*time.Second)
+
+		out, err = EvaluateExpression(`now("Europe/Rome").Location().String()`, scope)
+		assert.NoError(t, err)
+		assert.Equal(t, "Europe/Rome", out)
+
+		out, err = EvaluateBooleanExpression(`now() > dateAdd(now(), "-1h")`, scope)
+		assert.NoError(t, err)
+		assert.Equal(t, true, out)
+	})
+	t.Run("errors", func(t *testing.T) {
+		for _, e := range []string{
+			`now("Mars/Olympus")`,
+			`dateAdd(context.ts, "nope")`,
+			`dateFormat("garbage", "DateOnly")`,
+			`dateFormat(context.ts, "DateOnly", "UTC", "extra")`,
+		} {
+			_, err := EvaluateExpression(e, scope)
+			assert.Error(t, err, e)
+		}
+	})
 }

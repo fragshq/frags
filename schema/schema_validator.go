@@ -53,7 +53,19 @@ func (s *Schema) validate(data any, path string, softValidation bool) error {
 		if s.Nullable != nil && *s.Nullable {
 			return nil
 		}
-		return &ValidationError{Path: path, Message: "value is null but schema is not nullable"}
+		// a composite schema may still accept null through one of its branches
+		if len(s.AnyOf) == 0 && len(s.OneOf) == 0 {
+			return &ValidationError{Path: path, Message: "value is null but schema is not nullable"}
+		}
+	}
+
+	if len(s.OneOf) > 0 {
+		if err := s.validateOneOf(data, path, softValidation); err != nil {
+			return err
+		}
+		if data == nil || (len(s.AnyOf) == 0 && s.Type == "") {
+			return nil
+		}
 	}
 
 	if len(s.AnyOf) > 0 {
@@ -93,6 +105,37 @@ func (s *Schema) validate(data any, path string, softValidation bool) error {
 	default:
 		return &ValidationError{Path: path, Message: fmt.Sprintf("unsupported type: %s", s.Type)}
 	}
+}
+
+// validateOneOf requires data to match exactly one of the OneOf branches.
+// Branches are first evaluated strictly. Soft validation coerces strings (e.g. "7" is
+// both a string and an integer), so it would make otherwise-exclusive branches overlap;
+// it is therefore only used as a fallback when no branch matches strictly, in which case
+// a single soft match is enough.
+func (s *Schema) validateOneOf(data any, path string, softValidation bool) error {
+	matches := s.countOneOfMatches(data, path, false)
+	if matches == 0 && softValidation {
+		if s.countOneOfMatches(data, path, true) > 0 {
+			return nil
+		}
+	}
+	switch {
+	case matches == 0:
+		return &ValidationError{Path: path, Message: "value does not match any of the schemas in oneOf"}
+	case matches > 1:
+		return &ValidationError{Path: path, Message: fmt.Sprintf("value matches %d schemas in oneOf, expected exactly one", matches)}
+	}
+	return nil
+}
+
+func (s *Schema) countOneOfMatches(data any, path string, softValidation bool) int {
+	matches := 0
+	for _, subSchema := range s.OneOf {
+		if subSchema.validate(data, path, softValidation) == nil {
+			matches++
+		}
+	}
+	return matches
 }
 
 func (s *Schema) validateObject(v reflect.Value, path string, softValidation bool) error {

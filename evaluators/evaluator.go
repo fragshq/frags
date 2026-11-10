@@ -23,8 +23,10 @@ import (
 	"reflect"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/expr-lang/expr"
+	"github.com/fragshq/frags/evaluators/dates"
 	"github.com/fragshq/frags/util"
 	"github.com/fragshq/zealql"
 )
@@ -189,6 +191,37 @@ var templateFuncs = template.FuncMap{
 	"json": func(v any) string {
 		return util.MustJsonIndentString(v)
 	},
+	"now": func(tz ...string) (dates.Time, error) {
+		zone, err := optionalTz(tz)
+		if err != nil {
+			return dates.Time{}, err
+		}
+		t, err := dates.Now(zone)
+		return dates.Time{Time: t}, err
+	},
+	"dateFormat": func(t any, layout string, tz ...string) (string, error) {
+		zone, err := optionalTz(tz)
+		if err != nil {
+			return "", err
+		}
+		return dates.Format(t, layout, zone)
+	},
+	"dateAdd": func(t any, duration string) (dates.Time, error) {
+		res, err := dates.Add(t, duration)
+		return dates.Time{Time: res}, err
+	},
+}
+
+// optionalTz extracts the optional timezone from variadic template function arguments.
+func optionalTz(tz []string) (string, error) {
+	switch len(tz) {
+	case 0:
+		return "", nil
+	case 1:
+		return tz[0], nil
+	default:
+		return "", errors.New("at most one timezone argument is allowed")
+	}
 }
 
 type Vars map[string]any
@@ -241,6 +274,31 @@ func exprFunctions() []expr.Option {
 			func(params ...any) (any, error) {
 				return EvaluateTemplate(params[0].(string), params[1].(map[string]any))
 			}, new(func(string, EvalScope) (string, error))),
+		expr.Function("now",
+			func(params ...any) (any, error) {
+				tz := ""
+				if len(params) > 0 {
+					tz = params[0].(string)
+				}
+				return dates.Now(tz)
+			},
+			new(func() time.Time),
+			new(func(string) (time.Time, error))),
+		expr.Function("dateFormat",
+			func(params ...any) (any, error) {
+				tz := ""
+				if len(params) > 2 {
+					tz = params[2].(string)
+				}
+				return dates.Format(params[0], params[1].(string), tz)
+			},
+			new(func(any, string) (string, error)),
+			new(func(any, string, string) (string, error))),
+		expr.Function("dateAdd",
+			func(params ...any) (any, error) {
+				return dates.Add(params[0], params[1].(string))
+			},
+			new(func(any, string) (time.Time, error))),
 	}
 }
 

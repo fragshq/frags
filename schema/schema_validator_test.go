@@ -208,3 +208,64 @@ func TestSchema_Validate_Soft(t *testing.T) {
 	})
 
 }
+
+func TestSchema_Validate_OneOf(t *testing.T) {
+	s := Schema{OneOf: []*Schema{
+		{Type: String},
+		{Type: Integer},
+	}}
+	t.Run("matches exactly one branch", func(t *testing.T) {
+		assert.NoError(t, s.Validate("hello", nil))
+		assert.NoError(t, s.Validate(7, nil))
+	})
+	t.Run("matches no branch", func(t *testing.T) {
+		assert.Error(t, s.Validate(true, nil))
+		assert.Error(t, s.Validate(2.5, nil))
+	})
+	t.Run("matches more than one branch", func(t *testing.T) {
+		overlapping := Schema{OneOf: []*Schema{
+			{Type: Integer},
+			{Type: Number},
+		}}
+		assert.Error(t, overlapping.Validate(1, nil))
+		assert.NoError(t, overlapping.Validate(2.5, nil))
+	})
+	t.Run("nested in object", func(t *testing.T) {
+		obj := Schema{Type: Object, Properties: map[string]*Schema{"v": &s}}
+		assert.NoError(t, obj.Validate(map[string]any{"v": "x"}, nil))
+		assert.Error(t, obj.Validate(map[string]any{"v": false}, nil))
+	})
+	t.Run("null branch", func(t *testing.T) {
+		nullable := true
+		withNull := Schema{OneOf: []*Schema{
+			{Type: String},
+			{Type: Integer, Nullable: &nullable},
+		}}
+		assert.NoError(t, withNull.Validate(nil, nil))
+		assert.Error(t, s.Validate(nil, nil))
+	})
+	t.Run("soft validation prefers strict match", func(t *testing.T) {
+		// "7" coerces to an integer under soft validation, but it is a string strictly:
+		// the strict match must win instead of being rejected as ambiguous.
+		assert.NoError(t, s.Validate("7", &ValidatorOptions{SoftValidation: true}))
+		intOrBool := Schema{OneOf: []*Schema{{Type: Integer}, {Type: Boolean}}}
+		assert.NoError(t, intOrBool.Validate("7", &ValidatorOptions{SoftValidation: true}))
+		assert.Error(t, intOrBool.Validate("7", nil))
+	})
+}
+
+func TestGuessSchema_ValidatesItsInput(t *testing.T) {
+	inputs := []any{
+		[]any{1, 2.5},
+		[]any{"hello", 42, true},
+		[]any{"a", 1, nil},
+		[]any{[]any{1, "a"}, []any{"b"}},
+		[]any{[]any{1, 2.5}, []any{3}},
+		[]any{map[string]any{"value": "hello"}, map[string]any{"value": 42}},
+		[]any{map[string]any{"value": 1}, map[string]any{"value": 2.5}, map[string]any{"value": nil}},
+	}
+	for _, in := range inputs {
+		s := GuessSchema(in)
+		assert.NoError(t, s.Validate(in, nil), "input %#v", in)
+	}
+}

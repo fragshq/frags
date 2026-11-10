@@ -122,6 +122,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if msg.Message != "" {
 					state.lastActivity = msg.Message
 				}
+				if msg.Type == log.InProgressEventType && msg.Component == log.ComputeUnitComponent && msg.Iteration != nil {
+					state.lastActivity = fmt.Sprintf("compute unit #%d in progress", *msg.Iteration+1)
+				}
 				state.component = string(msg.Component)
 				if state.startTime.IsZero() {
 					state.startTime = msg.Time
@@ -165,6 +168,8 @@ func styleComponent(comp log.EventComponent) string {
 		return s.Foreground(ColorCompApp).Render("app")
 	case log.McpComponent:
 		return s.Foreground(ColorCompMcp).Render("mcp")
+	case log.ComputeUnitComponent:
+		return s.Foreground(ColorCompComputeUnit).Render("compute-unit")
 	default:
 		return s.Foreground(ColorGray).Render(string(comp))
 	}
@@ -186,6 +191,8 @@ func formatEventLine(ev log.Event) string {
 		prefix = StyleEventPrefixError.Render("✘")
 	case log.ResultEventType:
 		prefix = StyleEventPrefixResult.Render("✔")
+	case log.InProgressEventType:
+		prefix = StyleEventPrefixProgress.Render("↻")
 	default:
 		prefix = StyleWillCreate.Render("●")
 	}

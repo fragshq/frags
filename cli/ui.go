@@ -55,6 +55,7 @@ var (
 	ColorCompAi          = lipgloss.Color("#FF00FF")
 	ColorCompApp         = lipgloss.Color("#8A8A8A")
 	ColorCompMcp         = lipgloss.Color("#D787FF")
+	ColorCompComputeUnit = lipgloss.Color("#FFD75F")
 )
 
 // Shared reusable Lipgloss Styles
@@ -97,14 +98,15 @@ var (
 	StyleRunnerError   = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF3333")).Bold(true)
 	StyleDivider       = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#BCBCBC", Dark: "#3A3A3A"})
 
-	StyleEventTime         = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#767676", Dark: "#585858"})
-	StyleEventPrefixStart  = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF00"))
-	StyleEventPrefixEnd    = lipgloss.NewStyle().Foreground(lipgloss.Color("#0000FF"))
-	StyleEventPrefixError  = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
-	StyleEventPrefixResult = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF66"))
-	StyleEventDetails      = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#767676", Dark: "#585858"})
-	StyleEventMsgError     = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF5F5F"))
-	StyleEventMsgDefault   = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#1C1C1C", Dark: "#D0D0D0"})
+	StyleEventTime           = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#767676", Dark: "#585858"})
+	StyleEventPrefixStart    = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF00"))
+	StyleEventPrefixEnd      = lipgloss.NewStyle().Foreground(lipgloss.Color("#0000FF"))
+	StyleEventPrefixError    = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
+	StyleEventPrefixResult   = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF66"))
+	StyleEventPrefixProgress = lipgloss.NewStyle().Foreground(ColorOrange)
+	StyleEventDetails        = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#767676", Dark: "#585858"})
+	StyleEventMsgError       = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF5F5F"))
+	StyleEventMsgDefault     = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#1C1C1C", Dark: "#D0D0D0"})
 
 	StyleActiveSessionsHeader = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.AdaptiveColor{Light: "#0087AF", Dark: "#00D7FF"})
 	StyleSessionIcon          = lipgloss.NewStyle().Foreground(ColorGreen)

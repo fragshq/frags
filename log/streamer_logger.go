@@ -31,10 +31,12 @@ import (
 type EventType string
 
 const GenericEventType EventType = "generic"
+const InProgressEventType EventType = "progress"
 const StartEventType EventType = "start"
 const EndEventType EventType = "end"
 const LoadEventType EventType = "load"
 const ErrorEventType EventType = "error"
+const WarningEventType EventType = "warning"
 const ResultEventType EventType = "result"
 const AuthEventType EventType = "auth"
 
@@ -50,6 +52,7 @@ const PromptComponent EventComponent = "prompt"
 const AiComponent EventComponent = "ai"
 const AppComponent EventComponent = "app"
 const McpComponent EventComponent = "mcp"
+const ComputeUnitComponent EventComponent = "computeUnit"
 
 type ChannelLevel string
 
