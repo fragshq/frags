@@ -107,7 +107,16 @@ func mergeSchemas(schemas []*Schema) *Schema {
 	}
 
 	// Group by type
-	groups := groupByType(schemas)
+	groups := groupByType(flattenOneOf(schemas))
+
+	// Every integer is also a number: keeping both as oneOf branches would make
+	// integers match twice, so widen integers to number.
+	if ints, ok := groups[string(Integer)]; ok {
+		if _, hasNumber := groups[string(Number)]; hasNumber {
+			groups[string(Number)] = append(groups[string(Number)], ints...)
+			delete(groups, string(Integer))
+		}
+	}
 
 	// If only one type is present, merge within that type
 	if len(groups) == 1 {
@@ -116,18 +125,52 @@ func mergeSchemas(schemas []*Schema) *Schema {
 		}
 	}
 
+	// A bare nullable branch has no type and would match any value, so it can't
+	// be a oneOf branch: fold it into the resulting schema instead.
+	_, hasNull := groups["null"]
+	delete(groups, "null")
+
 	// Multiple types → oneOf, but first try to merge within each type group
 	var branches []*Schema
 	for _, group := range sortedGroups(groups) {
 		branches = append(branches, mergeSchemas(group))
 	}
 
-	// Simplify: if one branch is nullable and the other is not, fold into nullable
-	if simplified, ok := trySimplifyNullable(branches); ok {
-		return simplified
+	if len(branches) == 1 {
+		result := *branches[0] // shallow copy
+		if hasNull {
+			result.Nullable = boolPtr(true)
+		}
+		return &result
 	}
 
-	return &Schema{OneOf: branches}
+	merged := &Schema{OneOf: branches}
+	if hasNull {
+		merged.Nullable = boolPtr(true)
+	}
+	return merged
+}
+
+// flattenOneOf replaces untyped oneOf schemas with their branches, so that previously
+// merged alternatives are regrouped by type rather than nested (nesting would let a
+// value match both the nested oneOf and a sibling branch of the same type).
+func flattenOneOf(schemas []*Schema) []*Schema {
+	var flat []*Schema
+	for _, s := range schemas {
+		if s.Type != "" || len(s.OneOf) == 0 {
+			flat = append(flat, s)
+			continue
+		}
+		flat = append(flat, flattenOneOf(s.OneOf)...)
+		if s.Nullable != nil && *s.Nullable {
+			flat = append(flat, nullable())
+		}
+	}
+	return flat
+}
+
+func boolPtr(b bool) *bool {
+	return &b
 }
 
 // mergeSchemas for schemas that share the same type
@@ -226,8 +269,6 @@ func groupByType(schemas []*Schema) map[string][]*Schema {
 		if t == "" {
 			if s.Nullable != nil && *s.Nullable {
 				t = "null"
-			} else if len(s.OneOf) > 0 {
-				t = "oneOf"
 			} else {
 				t = "unknown"
 			}
@@ -249,29 +290,6 @@ func sortedGroups(groups map[string][]*Schema) [][]*Schema {
 		result = append(result, groups[k])
 	}
 	return result
-}
-
-// trySimplifyNullable: if branches = [nullable, X], return X with Nullable=true
-func trySimplifyNullable(branches []*Schema) (*Schema, bool) {
-	if len(branches) != 2 {
-		return nil, false
-	}
-	nullIdx := -1
-	otherIdx := -1
-	for i, b := range branches {
-		if b.Type == "" && b.Nullable != nil && *b.Nullable {
-			nullIdx = i
-		} else {
-			otherIdx = i
-		}
-	}
-	if nullIdx == -1 || otherIdx == -1 {
-		return nil, false
-	}
-	result := *branches[otherIdx] // shallow copy
-	t := true
-	result.Nullable = &t
-	return &result, true
 }
 
 func sortedKeys(m map[string]*Schema) []string {
