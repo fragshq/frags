@@ -83,7 +83,7 @@ const (
 const (
 	maxIteratorKey     = "__max_iterator"
 	maxIteratorDefault = 15
-	maxIteratorLimit   = 100
+	MaxIteratorLimit   = 100
 )
 
 // sessionTask is a message to run a session.
@@ -189,7 +189,7 @@ func (r *Runner) maxIteratorOK(cnt int) bool {
 	if v == 0 {
 		v = maxIteratorDefault
 	}
-	return cnt < v && cnt < maxIteratorLimit
+	return cnt < v && cnt < MaxIteratorLimit
 }
 
 // Run runs the runner against an optional collection fo parameters
