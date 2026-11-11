@@ -3,15 +3,15 @@ module github.com/fragshq/frags/chatgpt
 go 1.25.4
 
 require (
-	github.com/avast/retry-go/v5 v5.0.0
-	github.com/fragshq/frags v1.0.0-rc6
+	github.com/avast/retry-go/v5 v5.1.1
+	github.com/fragshq/frags v1.0.0-rc8
 )
 
 require (
 	github.com/blues/jsonata-go v1.5.4 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/expr-lang/expr v1.17.8 // indirect
-	github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a // indirect
+	github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386 // indirect
 	github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381 // indirect
 	github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect

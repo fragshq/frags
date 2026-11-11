@@ -1,5 +1,7 @@
 github.com/avast/retry-go/v5 v5.0.0 h1:kf1Qc2UsTZ4qq8elDymqfbISvkyMuhgRxuJqX2NHP7k=
 github.com/avast/retry-go/v5 v5.0.0/go.mod h1://d+usmKWio1agtZfS1H/ltTqwtIfBnRq9zEwjc3eH8=
+github.com/avast/retry-go/v5 v5.1.1 h1:xinK2CJs8zMswWeFFSYeqBbqx9RskWDDdzybrFrz4Q8=
+github.com/avast/retry-go/v5 v5.1.1/go.mod h1:kb/MOVQOBAxjo+kIre6StLXJro2ZPAQh5IO/6wICTjI=
 github.com/blues/jsonata-go v1.5.4 h1:XCsXaVVMrt4lcpKeJw6mNJHqQpWU751cnHdCFUq3xd8=
 github.com/blues/jsonata-go v1.5.4/go.mod h1:uns2jymDrnI7y+UFYCqsRTEiAH22GyHnNXrkupAVFWI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -11,8 +13,10 @@ github.com/expr-lang/expr v1.17.8 h1:W1loDTT+0PQf5YteHSTpju2qfUfNoBt4yw9+wOEU9VM
 github.com/expr-lang/expr v1.17.8/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
 github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a h1:zVZCGCpPtNogxtKw+ij4jYiUewEVV/d+LnPyIrbgUho=
 github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a/go.mod h1:DYhYU5v/g45OZaPeMGebSaqk0cHJ9LJIdbNAQ5arOms=
+github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386/go.mod h1:DYhYU5v/g45OZaPeMGebSaqk0cHJ9LJIdbNAQ5arOms=
 github.com/fragshq/frags v1.0.0-rc6 h1:JyFl6F/bLS2+780wD0433D+lV7Z9pG+Lmo9qyfrWhFY=
 github.com/fragshq/frags v1.0.0-rc6/go.mod h1:UpgUTZLNGzf76FQt6xM5qQXIs2/QATWvV5WWQoO7vME=
+github.com/fragshq/frags v1.0.0-rc8/go.mod h1:E1/BIYxvELI+sptejsyRVPDXb3u++VG82HanzMq2bC4=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381 h1:qP4W/vHZmSXwH39YnyB8S5YMMmkeuSsVpSWNJSvxsio=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381/go.mod h1:xrP7R7yiSuv2B4Ij07MFdyq7VlRQSZ8hSQFnvmMQBn8=
 github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44 h1:2BvPv4uXgC1wx0oiiYWDq7Hatbvr2hzQSYUEXqETSEY=
@@ -68,6 +72,7 @@ github.com/segmentio/encoding v0.5.4/go.mod h1:HS1ZKa3kSN32ZHVZ7ZLPLXWvOVIiZtyJn
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
+github.com/stretchr/testify v1.12.1 h1:EuwCh5fleGS7H32xRwO3wRGT7DxrDhLAT6FF8MpWDWE=
 github.com/yosida95/uritemplate/v3 v3.0.2 h1:Ed3Oyj9yrmi9087+NczuL5BwkIc4wvTb5zIM+UJPGz4=
 github.com/yosida95/uritemplate/v3 v3.0.2/go.mod h1:ILOh0sOhIJR3+L/8afwt/kE++YT040gmv5BQTMR2HP4=
 golang.org/x/crypto v0.52.0 h1:RMs7fP2rXdep0CftQlK8Uf+kibLm7qkCcradZWYz988=
