@@ -3,9 +3,9 @@ module github.com/fragshq/frags/anthropic
 go 1.25.4
 
 require (
-	github.com/anthropics/anthropic-sdk-go v1.61.0
-	github.com/avast/retry-go/v5 v5.0.0
-	github.com/fragshq/frags v1.0.0-rc6
+	github.com/anthropics/anthropic-sdk-go v1.84.0
+	github.com/avast/retry-go/v5 v5.1.1
+	github.com/fragshq/frags v1.0.0-rc8
 	github.com/jinzhu/copier v0.4.0
 )
 
@@ -15,10 +15,12 @@ require (
 	github.com/buger/jsonparser v1.1.2 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/expr-lang/expr v1.17.8 // indirect
-	github.com/fragshq/doauth v0.0.0-20260827100028-ce84cf68308a // indirect
+	github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386 // indirect
 	github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381 // indirect
 	github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
+	github.com/go-logr/logr v1.4.2 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.30.3 // indirect
@@ -42,6 +44,10 @@ require (
 	github.com/tidwall/pretty v1.2.1 // indirect
 	github.com/tidwall/sjson v1.2.5 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
+	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	go.opentelemetry.io/otel v1.33.0 // indirect
+	go.opentelemetry.io/otel/metric v1.33.0 // indirect
+	go.opentelemetry.io/otel/trace v1.33.0 // indirect
 	go.yaml.in/yaml/v4 v4.0.0-rc.2 // indirect
 	golang.org/x/crypto v0.52.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
