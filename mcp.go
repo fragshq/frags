@@ -136,7 +136,13 @@ func (c *McpTool) selectAuthProvider(logger *log.StreamerLogger) mcpauth.AuthPro
 		return nil
 	}
 
-	// 3. Fallback to OAuth2.
+	// 3. No client ID means OAuth was not opted into: connect without authentication.
+	// Custom headers are still applied by the caller.
+	if mcpauth.DerefOr(c.serverConfig.ClientID, "") == "" {
+		return nil
+	}
+
+	// 4. Fallback to OAuth2.
 	// We pre-build the HTTP client so that any custom headers are already included in the OAuth discovery/exchange.
 	client, _ := httpfactory.Instance.Builder().WithHeaders(c.serverConfig.HttpHeaders()).Build()
 
