@@ -82,8 +82,11 @@ const (
 )
 
 const (
-	maxIteratorKey     = "__max_iterator"
-	maxIteratorDefault = 15
+	maxIteratorKey = "__max_iterator"
+)
+
+var (
+	MaxIteratorDefault = 15
 	MaxIteratorLimit   = 100
 )
 
@@ -181,7 +184,7 @@ func NewRunner(sessionManager SessionManager, resourceLoader resources.ResourceL
 
 func initVars() evaluators.Vars {
 	vars := make(evaluators.Vars)
-	vars[maxIteratorKey] = maxIteratorDefault
+	vars[maxIteratorKey] = MaxIteratorDefault
 	return vars
 }
 
@@ -196,7 +199,7 @@ func (r *Runner) maxIteratorOK(cnt int) bool {
 		}
 	}
 	if v == 0 {
-		v = maxIteratorDefault
+		v = MaxIteratorDefault
 	}
 	return cnt < v && cnt < MaxIteratorLimit
 }
