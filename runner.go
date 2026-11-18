@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"math"
 	"os"
 	"regexp"
 	"sync"
@@ -185,7 +186,15 @@ func initVars() evaluators.Vars {
 }
 
 func (r *Runner) maxIteratorOK(cnt int) bool {
-	v, _ := r.vars[maxIteratorKey].(int)
+	v := 0
+	switch n := r.vars[maxIteratorKey].(type) {
+	case int:
+		v = n
+	case float64:
+		if n == math.Trunc(n) {
+			v = int(n)
+		}
+	}
 	if v == 0 {
 		v = maxIteratorDefault
 	}
