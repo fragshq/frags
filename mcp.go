@@ -22,9 +22,11 @@ import (
 	"encoding/json"
 	"errors"
 	"log/slog"
+	"maps"
 	"net/http"
 	"os"
 	"os/exec"
+	"slices"
 
 	"github.com/fragshq/doauth"
 	"github.com/fragshq/frags/httpfactory"
@@ -38,8 +40,9 @@ import (
 // McpTools returns  McpTool instances for each server configuration
 func (m McpServerConfigs) McpTools() McpTools {
 	tools := make(McpTools, 0)
-	for name, server := range m {
-		if !server.Disabled {
+	// sorting names, so that the order of servers is deterministic
+	for _, name := range slices.Sorted(maps.Keys(m)) {
+		if server := m[name]; !server.Disabled {
 			tools = append(tools, NewMcpTool(name, server))
 		}
 	}
@@ -222,7 +225,7 @@ func (c *McpTool) AsFunctions(ctx context.Context) (ExternalFunctions, error) {
 		return functions, err
 	}
 	for _, t := range tools {
-		functions[t.Name] = ExternalFunction{
+		fx := ExternalFunction{
 			Name:        t.Name,
 			Description: t.Description,
 			Collection:  c.Name,
@@ -231,6 +234,7 @@ func (c *McpTool) AsFunctions(ctx context.Context) (ExternalFunctions, error) {
 				return c.Run(ctx, t.Name, data)
 			},
 		}
+		functions[fx.QualifiedName()] = fx
 	}
 	return functions, nil
 }
@@ -300,9 +304,7 @@ func (m McpTools) AsFunctions(ctx context.Context) (ExternalFunctions, error) {
 		if err != nil {
 			return nil, err
 		}
-		for k, v := range fs {
-			functions[k] = v
-		}
+		functions = functions.WithFunctions(fs)
 	}
 	return functions, nil
 }

@@ -22,7 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -109,7 +108,7 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 		return nil, nil
 	}
 
-	chatGptTools, err := d.configureTools(tools)
+	chatGptTools, resolved, err := d.configureTools(tools)
 	if err != nil {
 		return nil, err
 	}
@@ -189,7 +188,7 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 			d.content = append(d.content, item)
 		}
 		if response.HasFunctionCalls() {
-			if err := d.handleFunctionCalls(ctx, response, runner); err != nil {
+			if err := d.handleFunctionCalls(ctx, response, resolved, runner); err != nil {
 				return nil, err
 			}
 		} else {
@@ -206,47 +205,26 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	return []byte(out), err
 }
 
-func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]ChatGptTool, error) {
-	oaTools := make([]ChatGptTool, 0)
-	for _, tool := range tools {
-		switch tool.Type {
-		case frags.ToolTypeFunction:
-			if fx, found := d.Functions[tool.Name]; found {
-				pSchema := fx.Schema
-				if tool.InputSchema != nil {
-					pSchema = tool.InputSchema
-				}
-
-				description := fx.Description
-				if len(tool.Description) > 0 {
-					description = tool.Description
-				}
-				oaTools = append(oaTools, ChatGptTool{
-					Name:        tool.Name,
-					Type:        PartTypeFunction,
-					Description: description,
-					Parameters:  pSchema,
-				})
-			}
-		case frags.ToolTypeMCP, frags.ToolTypeCollection:
-			for k, v := range d.Functions.ListByCollection(tool.Name) {
-				if tool.Allowlist == nil || slices.Contains(*tool.Allowlist, k) {
-					oaTools = append(oaTools, ChatGptTool{
-						Type:        PartTypeFunction,
-						Name:        k,
-						Description: v.Description,
-						Parameters:  v.Schema,
-					})
-				}
-			}
-		case frags.ToolTypeInternetSearch:
-			oaTools = append(oaTools, ChatGptTool{
-				Type: "web_search",
-			})
-		}
-
+func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]ChatGptTool, frags.ResolvedTools, error) {
+	resolved, err := tools.Resolve(d.Functions)
+	if err != nil {
+		return nil, nil, err
 	}
-	return oaTools, nil
+	oaTools := make([]ChatGptTool, 0)
+	for _, rt := range resolved {
+		oaTools = append(oaTools, ChatGptTool{
+			Type:        PartTypeFunction,
+			Name:        rt.ExposedName,
+			Description: rt.Description,
+			Parameters:  rt.Schema,
+		})
+	}
+	if tools.HasType(frags.ToolTypeInternetSearch) {
+		oaTools = append(oaTools, ChatGptTool{
+			Type: "web_search",
+		})
+	}
+	return oaTools, resolved, nil
 }
 
 func (d *Ai) SetFunctions(functions frags.ExternalFunctions) {
@@ -269,9 +247,9 @@ func NewFunctionResponseMap(data any, err error) FunctionResponseMap {
 	return res
 }
 
-func (d *Ai) handleFunctionCalls(ctx *util.FragsContext, responseMessage Response, runner frags.ExportableRunner) error {
+func (d *Ai) handleFunctionCalls(ctx *util.FragsContext, responseMessage Response, resolved frags.ResolvedTools, runner frags.ExportableRunner) error {
 	for _, fc := range responseMessage.FunctionCalls() {
-		res, err := d.RunFunction(ctx, frags.FunctionCaller{Name: fc.Name, Args: fc.Arguments.GetMap()}, runner)
+		res, err := resolved.Run(ctx, fc.Name, fc.Arguments.GetMap(), runner)
 		data, _ := json.Marshal(NewFunctionResponseMap(res, err))
 
 		d.content = append(d.content, Message{

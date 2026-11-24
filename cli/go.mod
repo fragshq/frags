@@ -154,3 +154,5 @@ replace github.com/fragshq/frags/chatgpt v1.0.0-rc6 => ../chatgpt
 replace github.com/fragshq/frags/anthropic v1.0.0-rc6 => ../anthropic
 
 replace github.com/fragshq/frags/gemini v1.0.0-rc3 => ../gemini
+
+replace github.com/fragshq/apicp v0.0.0-20261027102842-2ad666634504 => ../../diaphora/aacp

@@ -717,11 +717,11 @@ func (r *Runner) ListFailedSessions() []string {
 }
 
 func (r *Runner) RunFunction(ctx *util.FragsContext, name string, args map[string]any) (any, error) {
-	f, ok := r.ExternalFunctions[name]
-	if ok {
-		return f.Run(ctx, args, r)
+	f, err := r.ExternalFunctions.Resolve(name)
+	if err != nil {
+		return nil, err
 	}
-	return nil, fmt.Errorf("function %s not found", name)
+	return f.Run(ctx, args, r)
 }
 
 func (r *Runner) Logger() *log.StreamerLogger {

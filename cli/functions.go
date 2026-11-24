@@ -21,9 +21,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"github.com/fragshq/apicp"
 	apiCpCollection "github.com/fragshq/apicp/collection"
@@ -172,8 +176,20 @@ func connectMcpAndCollections(ctx context.Context, toolsConfig ExtendedToolsConf
 
 		toolDefinitions = append(toolDefinitions, frags.ToolDefinition{
 			Name: c.Name(),
-			Type: "aicp",
+			Type: frags.ToolTypeApicp,
 		})
 	}
+	warnFunctionCollisions(functions, logger)
 	return mcpTools, toolCollections, toolDefinitions, functions, nil
+}
+
+// warnFunctionCollisions logs a warning for each function name exposed by more than one MCP server or collection.
+// Such functions can only be called by their qualified name (collection:name).
+func warnFunctionCollisions(functions frags.ExternalFunctions, logger *log.StreamerLogger) {
+	collisions := functions.Collisions()
+	for _, name := range slices.Sorted(maps.Keys(collisions)) {
+		logger.Warn(log.NewEvent(log.GenericEventType, log.McpComponent).
+			WithMessage(fmt.Sprintf("function %s is exposed by multiple servers/collections, refer to it as one of: %s",
+				name, strings.Join(collisions[name], ", "))))
+	}
 }

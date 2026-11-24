@@ -18,6 +18,8 @@
 package frags
 
 import (
+	"slices"
+
 	"github.com/blues/jsonata-go"
 	"github.com/fragshq/frags/evaluators"
 	"github.com/fragshq/frags/log"
@@ -52,21 +54,24 @@ type TransformerCallbackFunc func(ctx *util.FragsContext, data any, runner Expor
 
 type Transformers []Transformer
 
-// FilterOnFunctionOutput filters the transformers based on the OnFunctionOutput trigger
-func (t Transformers) FilterOnFunctionOutput(name string) Transformers {
+// FilterOnFunctionOutput filters the transformers based on the OnFunctionOutput trigger. A transformer matches if its
+// trigger equals any of the given names (typically the bare and the qualified function name).
+func (t Transformers) FilterOnFunctionOutput(names ...string) Transformers {
 	t2 := make(Transformers, 0)
 	for _, t := range t {
-		if t.OnFunctionOutput != nil && *t.OnFunctionOutput == name {
+		if t.OnFunctionOutput != nil && slices.Contains(names, *t.OnFunctionOutput) {
 			t2 = append(t2, t)
 		}
 	}
 	return t2
 }
 
-func (t Transformers) FilterOnFunctionInput(name string) Transformers {
+// FilterOnFunctionInput filters the transformers based on the OnFunctionInput trigger. A transformer matches if its
+// trigger equals any of the given names (typically the bare and the qualified function name).
+func (t Transformers) FilterOnFunctionInput(names ...string) Transformers {
 	t2 := make(Transformers, 0)
 	for _, t := range t {
-		if t.OnFunctionInput != nil && *t.OnFunctionInput == name {
+		if t.OnFunctionInput != nil && slices.Contains(names, *t.OnFunctionInput) {
 			t2 = append(t2, t)
 		}
 	}

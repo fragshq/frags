@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"slices"
 	"strings"
 	"time"
 
@@ -122,7 +121,7 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 		return nil, nil
 	}
 
-	tx, err := d.configureTools(tools)
+	tx, resolved, err := d.configureTools(tools)
 	runner.Logger().Debug(log.NewEvent(log.GenericEventType, log.AiComponent).WithEngine(engine).WithMessage("configured tools").WithContent(tools))
 	if err != nil {
 		return nil, err
@@ -223,7 +222,7 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 				currentTurnText += block.Text
 			} else if block.Type == "tool_use" {
 				hasToolCalls = true
-				fres, ferr := d.RunFunction(ctx, frags.FunctionCaller{Name: block.Name, Args: decodeRawJsonMessageToMap(block.Input)}, runner)
+				fres, ferr := resolved.Run(ctx, block.Name, decodeRawJsonMessageToMap(block.Input), runner)
 
 				fresBytes, _ := json.Marshal(NewFunctionResponseMap(fres, ferr))
 				toolResultBlocks = append(toolResultBlocks, anthropic.NewToolResultBlock(block.ID, string(fresBytes), ferr != nil))
@@ -245,62 +244,38 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	return []byte(out), err
 }
 
-func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]anthropic.ToolUnionParam, error) {
-	tx := make([]anthropic.ToolUnionParam, 0)
-	for _, tool := range tools {
-		switch tool.Type {
-		case frags.ToolTypeFunction:
-			if fx, found := d.Functions[tool.Name]; found {
-				pSchema := fx.Schema
-				if tool.InputSchema != nil {
-					pSchema = tool.InputSchema
-				}
-
-				var inputSchema any
-				if pSchema != nil {
-					schemaBytes, _ := json.Marshal(pSchema)
-					_ = json.Unmarshal(schemaBytes, &inputSchema)
-				} else {
-					inputSchema = map[string]any{"type": "object", "properties": map[string]any{}}
-				}
-
-				description := fx.Description
-				if len(tool.Description) > 0 {
-					description = tool.Description
-				}
-				px := anthropic.ToolInputSchemaParam{}
-				_ = copier.Copy(&px, inputSchema)
-				tx = append(tx, anthropic.ToolUnionParam{
-					OfTool: &anthropic.ToolParam{
-						Name:        tool.Name,
-						Description: anthropic.Opt(description),
-						InputSchema: px,
-					},
-				})
-			}
-		case frags.ToolTypeMCP, frags.ToolTypeCollection:
-			for k, v := range d.Functions.ListByCollection(tool.Name) {
-				if tool.Allowlist == nil || slices.Contains(*tool.Allowlist, k) {
-					px := anthropic.ToolInputSchemaParam{}
-					_ = copier.Copy(&px, v.Schema)
-					tx = append(tx, anthropic.ToolUnionParam{
-						OfTool: &anthropic.ToolParam{
-							Name:        k,
-							Description: anthropic.Opt(v.Description),
-							InputSchema: px,
-						},
-					})
-				}
-			}
-		case frags.ToolTypeInternetSearch:
-			tx = append(tx, anthropic.ToolUnionParam{
-				OfWebSearchTool20250305: &anthropic.WebSearchTool20250305Param{
-					MaxUses: anthropic.Int(2),
-				},
-			})
-		}
+func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]anthropic.ToolUnionParam, frags.ResolvedTools, error) {
+	resolved, err := tools.Resolve(d.Functions)
+	if err != nil {
+		return nil, nil, err
 	}
-	return tx, nil
+	tx := make([]anthropic.ToolUnionParam, 0)
+	for _, rt := range resolved {
+		var inputSchema any
+		if rt.Schema != nil {
+			schemaBytes, _ := json.Marshal(rt.Schema)
+			_ = json.Unmarshal(schemaBytes, &inputSchema)
+		} else {
+			inputSchema = map[string]any{"type": "object", "properties": map[string]any{}}
+		}
+		px := anthropic.ToolInputSchemaParam{}
+		_ = copier.Copy(&px, inputSchema)
+		tx = append(tx, anthropic.ToolUnionParam{
+			OfTool: &anthropic.ToolParam{
+				Name:        rt.ExposedName,
+				Description: anthropic.Opt(rt.Description),
+				InputSchema: px,
+			},
+		})
+	}
+	if tools.HasType(frags.ToolTypeInternetSearch) {
+		tx = append(tx, anthropic.ToolUnionParam{
+			OfWebSearchTool20250305: &anthropic.WebSearchTool20250305Param{
+				MaxUses: anthropic.Int(2),
+			},
+		})
+	}
+	return tx, resolved, nil
 }
 
 func (d *Ai) SetFunctions(functions frags.ExternalFunctions) {
