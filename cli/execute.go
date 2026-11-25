@@ -61,7 +61,13 @@ func execute(ctx *util.FragsContext, sm frags.SessionManager, paramsMap map[stri
 	defer func() {
 		_ = mcpTools.Close()
 	}()
-	db, _ := zealql.NewDatabase()
+	db, err := zealql.NewDatabase()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = db.Close()
+	}()
 	zealCollection := data.New(db)
 	functions = functions.WithFunctions(zealCollection.AsFunctions())
 	// the data collection is always available, so plans can `require collection data` like any other collection
