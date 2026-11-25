@@ -147,6 +147,35 @@ func TestResolvedTools_Run(t *testing.T) {
 	assert.Equal(t, "hr", out)
 }
 
+// TestResolvedTools_Run_HashedName makes sure that names over the provider limit, which get truncated and hashed,
+// still dispatch to the right function, even when two of them share the same truncated stem
+func TestResolvedTools_Run_HashedName(t *testing.T) {
+	server := "Barndoor-SalesForce-Something"
+	fx := ExternalFunctions{}
+	for _, name := range []string{"search_opportunities_by_account_owner", "search_opportunities_by_account_region"} {
+		f := ExternalFunction{Name: name, Collection: server, Func: func(ctx *util.FragsContext, data map[string]any) (any, error) {
+			return name, nil
+		}}
+		fx[f.QualifiedName()] = f
+	}
+	runner := NewRunner(NewSessionManager(), resources.NewDummyResourceLoader(), NewDummyAi(), WithExternalFunctions(fx))
+	ctx := util.NewFragsContext(time.Minute)
+
+	res, err := ToolDefinitions{{Name: server, Type: ToolTypeMCP}}.Resolve(fx)
+	assert.NoError(t, err)
+	assert.Len(t, res, 2)
+	again, err := ToolDefinitions{{Name: server, Type: ToolTypeMCP}}.Resolve(fx)
+	assert.NoError(t, err)
+	for i, rt := range res {
+		assert.Len(t, rt.ExposedName, maxLlmNameLength)
+		assert.Equal(t, again[i].ExposedName, rt.ExposedName, "hashed names must be stable across requests")
+		out, err := res.Run(ctx, rt.ExposedName, nil, &runner)
+		assert.NoError(t, err)
+		assert.Equal(t, rt.Function.Name, out)
+	}
+	assert.NotEqual(t, res[0].ExposedName, res[1].ExposedName)
+}
+
 func TestLlmName(t *testing.T) {
 	assert.Equal(t, "crm_list_users", llmName(ExternalFunction{Name: "list_users", Collection: "crm"}))
 	assert.Equal(t, "github_create_issue", llmName(ExternalFunction{Name: "github_create_issue", Collection: "github"}))

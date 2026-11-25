@@ -4,60 +4,35 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestResolvePaths(t *testing.T) {
-	// Save current state
-	origCwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer func() {
-		_ = os.Chdir(origCwd)
-	}()
-
-	origXdg := os.Getenv("XDG_CONFIG_HOME")
-	origAppData := os.Getenv("APPDATA")
-	origHome := os.Getenv("HOME")
-	defer func() {
-		_ = os.Setenv("XDG_CONFIG_HOME", origXdg)
-		_ = os.Setenv("APPDATA", origAppData)
-		_ = os.Setenv("HOME", origHome)
-	}()
-
 	t.Run("tools.json in current directory", func(t *testing.T) {
 		tmpDir := t.TempDir()
 
 		// Change working directory to tmpDir
-		if err := os.Chdir(tmpDir); err != nil {
-			t.Fatal(err)
-		}
+		t.Chdir(tmpDir)
 
 		// Create tools.json in current directory
-		if err := os.WriteFile("tools.json", []byte("{}"), 0644); err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, os.WriteFile("tools.json", []byte("{}"), 0644))
 
 		// Set mock user config dir environment variables
 		mockUserConfig := filepath.Join(tmpDir, "user_config")
-		_ = os.Setenv("XDG_CONFIG_HOME", mockUserConfig)
-		_ = os.Setenv("APPDATA", mockUserConfig)
-		_ = os.Setenv("HOME", mockUserConfig)
+		t.Setenv("XDG_CONFIG_HOME", mockUserConfig)
+		t.Setenv("APPDATA", mockUserConfig)
+		t.Setenv("HOME", mockUserConfig)
 
 		// Get the active user config directory
 		uConfigDir, err := os.UserConfigDir()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		// Create tools.json in user config directory to ensure current dir takes precedence
 		userFragsDir := filepath.Join(uConfigDir, "frags")
-		if err := os.MkdirAll(userFragsDir, 0755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(filepath.Join(userFragsDir, "tools.json"), []byte("{}"), 0644); err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, os.MkdirAll(userFragsDir, 0755))
+		require.NoError(t, os.WriteFile(filepath.Join(userFragsDir, "tools.json"), []byte("{}"), 0644))
 
 		// Reset state
 		pathsResolved = false
@@ -65,44 +40,32 @@ func TestResolvePaths(t *testing.T) {
 		tools := getToolsPath()
 		tokens := getTokensPath()
 
-		if tools != "tools.json" {
-			t.Errorf("expected tools.json, got %s", tools)
-		}
-		if tokens != "tokens.json" {
-			t.Errorf("expected tokens.json, got %s", tokens)
-		}
+		assert.Equal(t, "tools.json", tools)
+		assert.Equal(t, "tokens.json", tokens)
 	})
 
 	t.Run("tools.json in user config directory", func(t *testing.T) {
 		tmpDir := t.TempDir()
 
 		// Change working directory to tmpDir (which has NO tools.json)
-		if err := os.Chdir(tmpDir); err != nil {
-			t.Fatal(err)
-		}
+		t.Chdir(tmpDir)
 
 		// Set mock user config dir environment variables
 		mockUserConfig := filepath.Join(tmpDir, "user_config")
-		_ = os.Setenv("XDG_CONFIG_HOME", mockUserConfig)
-		_ = os.Setenv("APPDATA", mockUserConfig)
-		_ = os.Setenv("HOME", mockUserConfig)
+		t.Setenv("XDG_CONFIG_HOME", mockUserConfig)
+		t.Setenv("APPDATA", mockUserConfig)
+		t.Setenv("HOME", mockUserConfig)
 
 		// Get the active user config directory
 		uConfigDir, err := os.UserConfigDir()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		userFragsDir := filepath.Join(uConfigDir, "frags")
-		if err := os.MkdirAll(userFragsDir, 0755); err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, os.MkdirAll(userFragsDir, 0755))
 
 		// Create tools.json in user config directory
 		userToolsPath := filepath.Join(userFragsDir, "tools.json")
-		if err := os.WriteFile(userToolsPath, []byte("{}"), 0644); err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, os.WriteFile(userToolsPath, []byte("{}"), 0644))
 
 		// Reset state
 		pathsResolved = false
@@ -113,27 +76,21 @@ func TestResolvePaths(t *testing.T) {
 		expectedTools := userToolsPath
 		expectedTokens := filepath.Join(userFragsDir, "tokens.json")
 
-		if tools != expectedTools {
-			t.Errorf("expected %s, got %s", expectedTools, tools)
-		}
-		if tokens != expectedTokens {
-			t.Errorf("expected %s, got %s", expectedTokens, tokens)
-		}
+		assert.Equal(t, expectedTools, tools)
+		assert.Equal(t, expectedTokens, tokens)
 	})
 
 	t.Run("tools.json doesn't exist", func(t *testing.T) {
 		tmpDir := t.TempDir()
 
 		// Change working directory to empty tmpDir
-		if err := os.Chdir(tmpDir); err != nil {
-			t.Fatal(err)
-		}
+		t.Chdir(tmpDir)
 
 		// Set mock user config dir environment variables
 		mockUserConfig := filepath.Join(tmpDir, "user_config")
-		_ = os.Setenv("XDG_CONFIG_HOME", mockUserConfig)
-		_ = os.Setenv("APPDATA", mockUserConfig)
-		_ = os.Setenv("HOME", mockUserConfig)
+		t.Setenv("XDG_CONFIG_HOME", mockUserConfig)
+		t.Setenv("APPDATA", mockUserConfig)
+		t.Setenv("HOME", mockUserConfig)
 
 		// Reset state
 		pathsResolved = false
@@ -141,11 +98,7 @@ func TestResolvePaths(t *testing.T) {
 		tools := getToolsPath()
 		tokens := getTokensPath()
 
-		if tools != "tools.json" {
-			t.Errorf("expected tools.json, got %s", tools)
-		}
-		if tokens != "tokens.json" {
-			t.Errorf("expected tokens.json, got %s", tokens)
-		}
+		assert.Equal(t, "tools.json", tools)
+		assert.Equal(t, "tokens.json", tokens)
 	})
 }

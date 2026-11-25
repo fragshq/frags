@@ -63,10 +63,14 @@ func (t *ToolsCollectionConfigs) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// AsToolDefinitions returns the collection configs as tool definitions
+// AsToolDefinitions returns the enabled collection configs as tool definitions. Disabled collections are left out, so
+// that a plan requiring them fails RequiredTools.Check instead of running without them.
 func (t ToolsCollectionConfigs) AsToolDefinitions() ToolDefinitions {
 	tools := ToolDefinitions{}
-	for name, _ := range t {
+	for name, config := range t {
+		if config.Disabled {
+			continue
+		}
 		tools = append(tools, ToolDefinition{
 			Name: name,
 			Type: ToolTypeCollection,
@@ -106,10 +110,14 @@ func (m *McpServerConfig) HttpHeaders() http.Header {
 // McpServerConfigs is a map of MCP servers
 type McpServerConfigs map[string]McpServerConfig
 
-// AsToolDefinitions returns the MCP server configs as tool definitions
+// AsToolDefinitions returns the enabled MCP server configs as tool definitions. Disabled servers are left out, so that
+// a plan requiring them fails RequiredTools.Check instead of running without them.
 func (m McpServerConfigs) AsToolDefinitions() ToolDefinitions {
 	tools := ToolDefinitions{}
-	for name, _ := range m {
+	for name, config := range m {
+		if config.Disabled {
+			continue
+		}
 		tools = append(tools, ToolDefinition{
 			Name: name,
 			Type: ToolTypeMCP,

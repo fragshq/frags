@@ -100,8 +100,6 @@ github.com/expr-lang/expr v1.17.8 h1:W1loDTT+0PQf5YteHSTpju2qfUfNoBt4yw9+wOEU9VM
 github.com/expr-lang/expr v1.17.8/go.mod h1:8/vRC7+7HBzESEqt5kKpYXxrxkr31SaO8r40VO/1IT4=
 github.com/felixge/httpsnoop v1.1.0 h1:3YtUj32ZZkqZtt3sZZsClsymw/QDuVfpNhoA31zeORc=
 github.com/felixge/httpsnoop v1.1.0/go.mod h1:Zqxgdd+1Rkcz8euOqdr7lqgCRJztwr5hp9vDSi5UZCE=
-github.com/fragshq/apicp v0.0.0-20261027102842-2ad666634504 h1:spZ7LZBlrO2WNAvFb+26S9PLzpKaCZAU2tSsFQDwcS8=
-github.com/fragshq/apicp v0.0.0-20261027102842-2ad666634504/go.mod h1:LmNK+qvMqQrxcqlDMrpldsGk+yD+9+TfXwUT7iHCu9Q=
 github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386 h1:Oq9Tn89BMoSYY7m7e1XEubpkB1C4WSsTWYhKuZOycic=
 github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386/go.mod h1:DYhYU5v/g45OZaPeMGebSaqk0cHJ9LJIdbNAQ5arOms=
 github.com/fragshq/fml v0.3.1 h1:BHOJn9e1GSfDK5YY9WA42NCJIYWpER/IVwCAeNKdUIk=
@@ -114,10 +112,6 @@ github.com/fragshq/fragsfunctions/data v0.8.0 h1:KBlhZJck7QF6+tmEzVAOw/vcaS+yVGB
 github.com/fragshq/fragsfunctions/data v0.8.0/go.mod h1:3uS4uwkeF7NKI/2d7TE1YhdSnxOzbQbFMLCr7zw9xR0=
 github.com/fragshq/fragsfunctions/fs v0.9.0 h1:8lgUAf7Bzvv5f/z+omSeDNzcFor0SzGSAE3WS8tR9tQ=
 github.com/fragshq/fragsfunctions/fs v0.9.0/go.mod h1:QiBsBM5HfBEZGxI30q19jTGbD8/U1oe2hXMiMz0b2NQ=
-github.com/fragshq/fragsfunctions/http v0.9.0 h1:RDlkHnu1wAsz8S2/qS6vQ4MlgHBFUbNU7VQju2aNKaI=
-github.com/fragshq/fragsfunctions/http v0.9.0/go.mod h1:NuxY+yaWjlNhf8zgLnODLfQV1SsjxbiI/bccFIgU5pk=
-github.com/fragshq/fragsfunctions/postgres v0.9.0 h1:WDqwEXs29phjzFGPbmGjNDU0j5bXesbE5axF1n29QtI=
-github.com/fragshq/fragsfunctions/postgres v0.9.0/go.mod h1:a4zTbQ76bgkCBfSgzgJUSbeIliyoA8xMXEUPnALRQMI=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381 h1:qP4W/vHZmSXwH39YnyB8S5YMMmkeuSsVpSWNJSvxsio=
 github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381/go.mod h1:xrP7R7yiSuv2B4Ij07MFdyq7VlRQSZ8hSQFnvmMQBn8=
 github.com/fragshq/zealql v0.0.0-20260827095741-3b59c322de44 h1:2BvPv4uXgC1wx0oiiYWDq7Hatbvr2hzQSYUEXqETSEY=

@@ -96,6 +96,44 @@ type ApiCPConfig struct {
 	Disabled bool        `json:"disabled"`
 }
 
+// ScopedTo returns a copy of the configuration that only contains the MCP servers, collections and apicp instances
+// named in the plan's required tools, so that tools a plan doesn't require are neither connected nor callable (and
+// can't make a function name ambiguous). Tools are matched by name; the type is still verified later by
+// RequiredTools.Check. If the plan declares no required tools, the configuration is returned unchanged, so plans
+// without `require` statements keep seeing every configured tool.
+func (c ExtendedToolsConfig) ScopedTo(required frags.RequiredTools) ExtendedToolsConfig {
+	if len(required) == 0 {
+		return c
+	}
+	names := make(map[string]bool, len(required))
+	for _, r := range required {
+		names[r.Name] = true
+	}
+	scoped := ExtendedToolsConfig{
+		ToolsConfig: frags.ToolsConfig{
+			McpServers:  frags.McpServerConfigs{},
+			Collections: frags.ToolsCollectionConfigs{},
+		},
+		ApiCPs: map[string]ApiCPConfig{},
+	}
+	for k, v := range c.McpServers {
+		if names[k] {
+			scoped.McpServers[k] = v
+		}
+	}
+	for k, v := range c.Collections {
+		if names[k] {
+			scoped.Collections[k] = v
+		}
+	}
+	for k, v := range c.ApiCPs {
+		if names[k] {
+			scoped.ApiCPs[k] = v
+		}
+	}
+	return scoped
+}
+
 // readToolsFile reads the tools configuration file and returns the parsed configuration
 func readToolsFile() (ExtendedToolsConfig, error) {
 	data, err := os.ReadFile(getToolsPath())
@@ -165,6 +203,9 @@ func connectMcpAndCollections(ctx context.Context, toolsConfig ExtendedToolsConf
 		}
 	}
 	for k, v := range toolsConfig.ApiCPs {
+		if v.Disabled {
+			continue
+		}
 		v.Config.Logger(slog.Default())
 		client, _ := sesat2.New().Build()
 		c, err := apiCpCollection.New(k, &v.Config, client)
