@@ -19,6 +19,7 @@ package chatgpt
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 
 	"github.com/fragshq/frags/schema"
@@ -29,6 +30,7 @@ const PartTypeFunctionCall = "function_call"
 const PartTypeFunctionCallOutput = "function_call_output"
 const PartTypeJsonSchema = "json_schema"
 const PartTypeInputFile = "input_file"
+const PartTypeInputImage = "input_image"
 const PartTypeFunction = "function"
 const RoleUser = "user"
 
@@ -114,7 +116,8 @@ type ContentPart struct {
 	Type     string `json:"type"`
 	Text     string `json:"-"`
 	ImageURL string `json:"image_url,omitempty"`
-	FileID   string `json:"file_id,omitempty"`
+	FileData string `json:"file_data,omitempty"`
+	Filename string `json:"filename,omitempty"`
 	TextObj  any    `json:"-"`
 }
 
@@ -129,7 +132,8 @@ func (c *ContentPart) UnmarshalJSON(data []byte) error {
 	}
 	c.Type = aux.Type
 	c.ImageURL = aux.ImageURL
-	c.FileID = aux.FileID
+	c.FileData = aux.FileData
+	c.Filename = aux.Filename
 
 	if len(aux.Text) > 0 {
 		aux.Text = bytes.TrimSpace(aux.Text)
@@ -191,11 +195,25 @@ func (c *ContentParts) InsertTextPart(text string) {
 	}}, *c...)
 }
 
-func (c *ContentParts) InsertFileMessage(fileId string) {
+// InsertFilePart prepends a file, sent inline as a base64 data URL
+func (c *ContentParts) InsertFilePart(filename string, mediaType string, content []byte) {
 	*c = append([]ContentPart{{
-		Type:   PartTypeInputFile,
-		FileID: fileId,
+		Type:     PartTypeInputFile,
+		Filename: filename,
+		FileData: toDataURL(mediaType, content),
 	}}, *c...)
+}
+
+// InsertImagePart prepends an image, sent inline as a base64 data URL
+func (c *ContentParts) InsertImagePart(mediaType string, content []byte) {
+	*c = append([]ContentPart{{
+		Type:     PartTypeInputImage,
+		ImageURL: toDataURL(mediaType, content),
+	}}, *c...)
+}
+
+func toDataURL(mediaType string, content []byte) string {
+	return "data:" + mediaType + ";base64," + base64.StdEncoding.EncodeToString(content)
 }
 
 func (c *ContentParts) First() ContentPart {
@@ -250,17 +268,6 @@ func (r Response) FunctionCalls() []Message {
 // ChatOptions contains optional parameters for the Chat method
 type ChatOptions struct {
 	Schema          any
-	FileIDs         []string
 	Tools           []ChatGptTool
 	EnableWebSearch bool
-}
-
-type FileDescriptor struct {
-	Id        string `json:"id"`
-	Object    string `json:"object"`
-	Bytes     int    `json:"bytes"`
-	CreatedAt int    `json:"created_at"`
-	ExpiresAt int    `json:"expires_at"`
-	Filename  string `json:"filename"`
-	Purpose   string `json:"purpose"`
 }

@@ -23,7 +23,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io"
-	"mime/multipart"
 	"net/http"
 	"time"
 )
@@ -89,58 +88,4 @@ func (c *HttpClient) PostResponses(ctx context.Context, content any) (Response, 
 
 	err = json.Unmarshal(data, &response)
 	return response, err
-}
-
-func (c *HttpClient) FileUpload(ctx context.Context, filename string, content []byte) (FileDescriptor, error) {
-	fd := FileDescriptor{}
-	var body bytes.Buffer
-	writer := multipart.NewWriter(&body)
-	defer func() {
-		_ = writer.Close()
-	}()
-	if err := writer.WriteField("purpose", "assistants"); err != nil {
-		return fd, err
-	}
-
-	if err := writer.WriteField("expires_after[anchor]", "created_at"); err != nil {
-		return fd, err
-	}
-
-	if err := writer.WriteField("expires_after[seconds]", "3600"); err != nil {
-		return fd, err
-	}
-	part, err := writer.CreateFormFile("file", filename)
-	if err != nil {
-		return fd, err
-	}
-
-	if _, err := part.Write(content); err != nil {
-		return fd, err
-	}
-
-	if err := writer.Close(); err != nil {
-		return fd, err
-	}
-	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/files", &body)
-	if err != nil {
-		return fd, err
-	}
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-	res, err := c.Client.Do(req)
-	if err != nil {
-		return fd, err
-	}
-	defer func() {
-		_ = res.Body.Close()
-	}()
-	data, err := io.ReadAll(res.Body)
-	if res.StatusCode >= 400 {
-		return fd, errors.New(string(data))
-	}
-
-	if err != nil {
-		return fd, err
-	}
-	err = json.Unmarshal(data, &fd)
-	return fd, err
 }

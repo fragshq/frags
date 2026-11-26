@@ -22,8 +22,8 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"path/filepath"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/avast/retry-go/v5"
@@ -45,8 +45,6 @@ type Ai struct {
 	config       Config
 	content      Messages
 	Functions    frags.ExternalFunctions
-	files        map[string]string
-	uploadMutex  *sync.Mutex
 }
 type Config struct {
 	Model         string        `yaml:"model" json:"model"`
@@ -69,14 +67,12 @@ func (d *Ai) SetSystemPrompt(prompt string) {
 
 func NewAI(baseURL string, apiKey string, config Config) *Ai {
 	return &Ai{
-		apiKey:      apiKey,
-		baseURL:     baseURL,
-		config:      config,
-		content:     make([]Message, 0),
-		Functions:   frags.ExternalFunctions{},
-		files:       make(map[string]string),
-		httpClient:  NewHttpClient(baseURL, apiKey),
-		uploadMutex: &sync.Mutex{},
+		apiKey:     apiKey,
+		baseURL:    baseURL,
+		config:     config,
+		content:    make([]Message, 0),
+		Functions:  frags.ExternalFunctions{},
+		httpClient: NewHttpClient(baseURL, apiKey),
 	}
 }
 
@@ -90,8 +86,6 @@ func (d *Ai) New() frags.Ai {
 		Functions:    d.Functions,
 		config:       d.config,
 		systemPrompt: d.systemPrompt,
-		files:        d.files,
-		uploadMutex:  d.uploadMutex,
 	}
 }
 
@@ -117,28 +111,16 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	for _, r := range rx {
 		switch r.MediaType {
 		case util.MediaText:
-			// For some unexplainable reasons, the Upload API doesn't like text files, so the best thing we can do is
-			// attach them to the message itself.
+			// text resources are attached to the message itself, as plain text
 			msg.Content.InsertTextPart(fmt.Sprintf("=== %s === \n%s\n ===\n", r.Identifier, string(r.ByteContent)))
 		default:
-			if err = func() error {
-				d.uploadMutex.Lock()
-				defer d.uploadMutex.Unlock()
-				fid, ok := d.files[r.Identifier]
-				if !ok {
-					fd, err := d.httpClient.FileUpload(ctx, r.Identifier, r.ByteContent)
-					if err != nil {
-						return err
-					}
-					fid = fd.Id
-					d.files[r.Identifier] = fd.Id
-				}
-				msg.Content.InsertFileMessage(fid)
-				return nil
-			}(); err != nil {
-				return nil, err
+			// binary resources travel inline in the request, as base64 data URLs. Images must use input_image,
+			// everything else (PDFs, office documents...) uses input_file
+			if strings.HasPrefix(r.MediaType, "image/") {
+				msg.Content.InsertImagePart(r.MediaType, r.ByteContent)
+			} else {
+				msg.Content.InsertFilePart(filepath.Base(r.Identifier), r.MediaType, r.ByteContent)
 			}
-
 		}
 	}
 	d.content = append(d.content, msg)
