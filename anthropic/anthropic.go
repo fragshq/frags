@@ -16,7 +16,6 @@ import (
 	"github.com/fragshq/frags/resources"
 	"github.com/fragshq/frags/schema"
 	"github.com/fragshq/frags/util"
-	"github.com/jinzhu/copier"
 )
 
 const engine = "anthropic"
@@ -251,15 +250,10 @@ func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]anthropic.ToolUnionP
 	}
 	tx := make([]anthropic.ToolUnionParam, 0)
 	for _, rt := range resolved {
-		var inputSchema any
-		if rt.Schema != nil {
-			schemaBytes, _ := json.Marshal(rt.Schema)
-			_ = json.Unmarshal(schemaBytes, &inputSchema)
-		} else {
-			inputSchema = map[string]any{"type": "object", "properties": map[string]any{}}
+		px, err := toInputSchemaParam(rt.Schema)
+		if err != nil {
+			return nil, nil, err
 		}
-		px := anthropic.ToolInputSchemaParam{}
-		_ = copier.Copy(&px, inputSchema)
 		tx = append(tx, anthropic.ToolUnionParam{
 			OfTool: &anthropic.ToolParam{
 				Name:        rt.ExposedName,
@@ -284,4 +278,38 @@ func (d *Ai) SetFunctions(functions frags.ExternalFunctions) {
 
 func (d *Ai) RunFunction(ctx *util.FragsContext, functionCall frags.FunctionCaller, runner frags.ExportableRunner) (any, error) {
 	return runner.RunFunction(ctx, functionCall.Name, functionCall.Args)
+}
+
+// toInputSchemaParam converts a frags schema into the Anthropic input schema param. A nil schema becomes an empty
+// object schema, as Anthropic requires input_schema on every custom tool.
+func toInputSchemaParam(s *schema.Schema) (anthropic.ToolInputSchemaParam, error) {
+	px := anthropic.ToolInputSchemaParam{Properties: map[string]any{}}
+	if s == nil {
+		return px, nil
+	}
+	schemaBytes, err := json.Marshal(s)
+	if err != nil {
+		return px, err
+	}
+	raw := map[string]any{}
+	if err := json.Unmarshal(schemaBytes, &raw); err != nil {
+		return px, err
+	}
+	if props, ok := raw["properties"]; ok && props != nil {
+		px.Properties = props
+	}
+	if req, ok := raw["required"].([]any); ok {
+		for _, r := range req {
+			if rs, ok := r.(string); ok {
+				px.Required = append(px.Required, rs)
+			}
+		}
+	}
+	delete(raw, "type")
+	delete(raw, "properties")
+	delete(raw, "required")
+	if len(raw) > 0 {
+		px.ExtraFields = raw
+	}
+	return px, nil
 }

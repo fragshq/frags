@@ -6,7 +6,6 @@ require (
 	github.com/anthropics/anthropic-sdk-go v1.84.0
 	github.com/avast/retry-go/v5 v5.1.1
 	github.com/fragshq/frags v1.0.0-rc9
-	github.com/jinzhu/copier v0.4.0
 )
 
 require (
@@ -28,6 +27,7 @@ require (
 	github.com/google/jsonschema-go v0.4.3 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/invopop/jsonschema v0.14.0 // indirect
+	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/leodido/go-urn v1.5.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
