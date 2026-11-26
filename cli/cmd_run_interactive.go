@@ -21,10 +21,11 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
-	"time"
 
 	"github.com/charmbracelet/bubbles/spinner"
 	tea "github.com/charmbracelet/bubbletea"
@@ -40,10 +41,20 @@ type runResult struct {
 	err    error
 }
 
+// sessionState is what the Active Sessions block shows for a running session: the iteration being computed and the
+// phase it's in
 type sessionState struct {
-	lastActivity string
-	component    string
-	startTime    time.Time
+	iteration *int
+	phase     log.EventComponent
+}
+
+// sessionPhaseComponents are the components whose events describe where a session is. Their Iteration field is the
+// iterator index; other components reuse that field for worker indexes or retry attempts, so they're ignored here.
+var sessionPhaseComponents = []log.EventComponent{
+	log.SessionComponent,
+	log.ComputeUnitComponent,
+	log.PrePromptComponent,
+	log.PromptComponent,
 }
 
 type model struct {
@@ -108,26 +119,24 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, cmd
 
 	case log.Event:
-		m.events = append(m.events, msg)
-		if len(m.events) > 8 {
-			m.events = m.events[1:]
+		// compute unit events are meant for other consumers of the stream. The CLI still uses them below to track a
+		// session's iteration, but doesn't list them in the activity log
+		if msg.Component != log.ComputeUnitComponent {
+			m.events = append(m.events, msg)
+			if len(m.events) > 8 {
+				m.events = m.events[1:]
+			}
 		}
 
 		if msg.Session != nil {
 			sessID := *msg.Session
 			if msg.Component == log.SessionComponent && msg.Type == log.EndEventType {
 				delete(m.activeSessions, sessID)
-			} else {
+			} else if slices.Contains(sessionPhaseComponents, msg.Component) {
 				state := m.activeSessions[sessID]
-				if msg.Message != "" {
-					state.lastActivity = msg.Message
-				}
-				if msg.Type == log.InProgressEventType && msg.Component == log.ComputeUnitComponent && msg.Iteration != nil {
-					state.lastActivity = fmt.Sprintf("compute unit #%d in progress", *msg.Iteration+1)
-				}
-				state.component = string(msg.Component)
-				if state.startTime.IsZero() {
-					state.startTime = msg.Time
+				state.phase = msg.Component
+				if msg.Iteration != nil {
+					state.iteration = msg.Iteration
 				}
 				m.activeSessions[sessID] = state
 			}
@@ -281,13 +290,14 @@ func (m model) View() string {
 
 	if len(m.activeSessions) > 0 {
 		s.WriteString(StyleActiveSessionsHeader.Render("Active Sessions:") + "\n")
-		for id, state := range m.activeSessions {
-			sessIcon := StyleSessionIcon.Render("●")
-			line := fmt.Sprintf("  %s %s [%s]: %s",
-				sessIcon,
-				StyleSessionID.Render(id),
-				StyleSessionComp.Render(state.component),
-				StyleSessionText.Render(state.lastActivity))
+		// sorted, so lines don't swap places between renders
+		for _, id := range slices.Sorted(maps.Keys(m.activeSessions)) {
+			state := m.activeSessions[id]
+			line := fmt.Sprintf("  %s %s", StyleSessionIcon.Render("●"), StyleSessionID.Render(id))
+			if state.iteration != nil {
+				line += StyleSessionText.Render(fmt.Sprintf(" #%d", *state.iteration+1))
+			}
+			line += " " + styleComponent(state.phase)
 			if m.width > 0 {
 				line = lipgloss.NewStyle().Width(m.width - 2).Render(line)
 			}

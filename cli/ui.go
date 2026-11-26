@@ -111,7 +111,6 @@ var (
 	StyleActiveSessionsHeader = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.AdaptiveColor{Light: "#0087AF", Dark: "#00D7FF"})
 	StyleSessionIcon          = lipgloss.NewStyle().Foreground(ColorGreen)
 	StyleSessionID            = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.AdaptiveColor{Light: "#0087AF", Dark: "#00D7FF"})
-	StyleSessionComp          = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#D7005F", Dark: "#FF007F"})
 	StyleSessionText          = lipgloss.NewStyle().Foreground(lipgloss.AdaptiveColor{Light: "#1C1C1C", Dark: "#E5E5E5"})
 
 	StyleActivityLogsHeader = lipgloss.NewStyle().Bold(true).Foreground(lipgloss.AdaptiveColor{Light: "#875FDF", Dark: "#AF5FFF"})
