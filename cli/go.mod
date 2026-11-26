@@ -13,7 +13,7 @@ require (
 	github.com/fragshq/doauth v0.0.0-20261026135824-8ac913fdf386
 	github.com/fragshq/fml v0.3.1
 	github.com/fragshq/frags v1.0.0-rc9
-	github.com/fragshq/frags/anthropic v1.0.0
+	github.com/fragshq/frags/anthropic v1.0.1
 	github.com/fragshq/frags/chatgpt v1.0.0
 	github.com/fragshq/frags/gemini v1.0.0
 	github.com/fragshq/frags/ollama v1.0.0
@@ -24,7 +24,7 @@ require (
 	github.com/fragshq/sesat2 v0.0.0-20260827100353-fe1285f5e381
 	github.com/fragshq/zealql v0.0.0-20261125163104-0eca2fd5c33b
 	github.com/google/jsonschema-go v0.4.3
-	github.com/labstack/echo/v4 v4.16.3
+	github.com/labstack/echo/v4 v4.16.6
 	github.com/mattn/go-isatty v0.0.24
 	github.com/modelcontextprotocol/go-sdk v1.8.0
 	github.com/samber/lo v1.53.0
