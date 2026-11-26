@@ -17,6 +17,7 @@
 package schema
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/fragshq/frags/util"
@@ -48,6 +49,17 @@ func TestFromAny_MapstructureTypeArray(t *testing.T) {
 
 	assert.Equal(t, Type("integer"), s.Properties["age"].Type)
 	assert.Nil(t, s.Properties["age"].Nullable)
+}
+
+func TestFromAny_RawMessage(t *testing.T) {
+	s, err := FromAny(json.RawMessage(`{"type":"object","properties":{"q":{"type":"string"}},"required":["q"]}`))
+	assert.NoError(t, err)
+	assert.Equal(t, Type("object"), s.Type)
+	assert.Equal(t, Type("string"), s.Properties["q"].Type)
+	assert.Equal(t, []string{"q"}, s.Required)
+
+	_, err = FromAny(json.RawMessage(`{not json`))
+	assert.Error(t, err)
 }
 
 func TestFromAny_CopierTypeConverter(t *testing.T) {

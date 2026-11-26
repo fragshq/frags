@@ -83,14 +83,12 @@ func FromAny(data any) (*Schema, error) {
 		err := json.Unmarshal(typed, &schema)
 		return &schema, err
 	case json.RawMessage:
-		if err := json.Unmarshal(typed, &schema); err != nil {
-			return &schema, err
-		}
+		err := json.Unmarshal(typed, &schema)
+		return &schema, err
 	default:
 		err := schema.CopyFrom(typed)
 		return &schema, err
 	}
-	return &schema, errors.New("cannot convert schema")
 }
 
 // FromYAML unmarshals a YAML document into the Schema.
