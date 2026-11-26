@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"slices"
 	"strings"
 	"time"
 
@@ -132,7 +131,7 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	}
 	newMsg := genai.NewContentFromParts(parts, genai.RoleUser)
 
-	tx, err := d.configureTools(tools)
+	tx, resolved, err := d.configureTools(tools)
 	runner.Logger().Debug(log.NewEvent(log.GenericEventType, log.AiComponent).WithEngine(engine).WithMessage("configured tools").WithContent(tools))
 	if err != nil {
 		return nil, err
@@ -207,7 +206,7 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 				Parts: []*genai.Part{},
 			}
 			for _, fc := range res.FunctionCalls() {
-				fres, ferr := d.RunFunction(ctx, frags.FunctionCaller{Name: fc.Name, Args: fc.Args}, runner)
+				fres, ferr := resolved.Run(ctx, fc.Name, fc.Args, runner)
 				// adding a function response to the user turn object
 				userTurn.Parts = append(userTurn.Parts, &genai.Part{
 					FunctionResponse: &genai.FunctionResponse{
@@ -233,69 +232,44 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	return []byte(out), err
 }
 
-func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]*genai.Tool, error) {
+func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]*genai.Tool, frags.ResolvedTools, error) {
+	resolved, err := tools.Resolve(d.Functions)
+	if err != nil {
+		return nil, nil, err
+	}
 	tx := make([]*genai.Tool, 0)
 	fd := make([]*genai.FunctionDeclaration, 0)
-	for _, tool := range tools {
-		switch tool.Type {
-		case frags.ToolTypeFunction:
-			if fx, found := d.Functions[tool.Name]; found {
-				pSchema := fx.Schema
-				if tool.InputSchema != nil {
-					pSchema = tool.InputSchema
-				}
-				genAiPSchema := &genai.Schema{}
-				if err := pSchema.CopyTo(genAiPSchema); err != nil {
-					return nil, err
-				}
-				description := fx.Description
-				if len(tool.Description) > 0 {
-					description = tool.Description
-				}
-				fd = append(fd, &genai.FunctionDeclaration{
-					Name:        tool.Name,
-					Description: description,
-					Parameters:  genAiPSchema,
-				})
+	for _, rt := range resolved {
+		var genAiInputSchema *genai.Schema
+		if rt.Schema != nil {
+			genAiInputSchema = &genai.Schema{}
+			if err := rt.Schema.CopyTo(genAiInputSchema); err != nil {
+				return nil, nil, err
 			}
-		default:
-			for k, v := range d.Functions.ListByCollection(tool.Name) {
-				var genAiInputSchema *genai.Schema
-				if v.Schema != nil {
-					genAiInputSchema = &genai.Schema{}
-
-					if err := v.Schema.CopyTo(genAiInputSchema); err != nil {
-						return nil, err
-					}
-				}
-				var genAiOutputSchema *genai.Schema
-				if v.OutputSchema != nil {
-					genAiOutputSchema = &genai.Schema{}
-
-					_ = v.OutputSchema.CopyTo(genAiOutputSchema)
-				}
-				if tool.Allowlist == nil || slices.Contains(*tool.Allowlist, k) {
-					fd = append(fd, &genai.FunctionDeclaration{
-						Name:        k,
-						Description: v.Description,
-						Parameters:  genAiInputSchema,
-						Response:    genAiOutputSchema,
-					})
-				}
-
-			}
-		case frags.ToolTypeInternetSearch:
-			tx = append(tx, &genai.Tool{
-				GoogleSearch: &genai.GoogleSearch{},
-			})
 		}
+		var genAiOutputSchema *genai.Schema
+		if rt.OutputSchema != nil {
+			genAiOutputSchema = &genai.Schema{}
+			_ = rt.OutputSchema.CopyTo(genAiOutputSchema)
+		}
+		fd = append(fd, &genai.FunctionDeclaration{
+			Name:        rt.ExposedName,
+			Description: rt.Description,
+			Parameters:  genAiInputSchema,
+			Response:    genAiOutputSchema,
+		})
+	}
+	if tools.HasType(frags.ToolTypeInternetSearch) {
+		tx = append(tx, &genai.Tool{
+			GoogleSearch: &genai.GoogleSearch{},
+		})
 	}
 	if len(fd) > 0 {
 		tx = append(tx, &genai.Tool{
 			FunctionDeclarations: fd,
 		})
 	}
-	return tx, nil
+	return tx, resolved, nil
 }
 
 func (d *Ai) SetFunctions(functions frags.ExternalFunctions) {

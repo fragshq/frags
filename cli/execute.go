@@ -53,16 +53,25 @@ func execute(ctx *util.FragsContext, sm frags.SessionManager, paramsMap map[stri
 	if err != nil {
 		return nil, err
 	}
-	mcpTools, _, definitions, functions, err := connectMcpAndCollections(ctx, toolConfig, logger)
+	// only the tools the plan requires are connected, so unrelated tools in tools.json can't clash with them
+	mcpTools, _, definitions, functions, err := connectMcpAndCollections(ctx, toolConfig.ScopedTo(sm.RequiredTools), logger)
 	if err != nil {
 		return nil, err
 	}
 	defer func() {
 		_ = mcpTools.Close()
 	}()
-	db, _ := zealql.NewDatabase()
+	db, err := zealql.NewDatabase()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		_ = db.Close()
+	}()
 	zealCollection := data.New(db)
 	functions = functions.WithFunctions(zealCollection.AsFunctions())
+	// the data collection is always available, so plans can `require collection data` like any other collection
+	definitions = append(definitions, frags.ToolDefinition{Name: zealCollection.Name(), Type: frags.ToolTypeCollection})
 
 	ai.SetFunctions(functions)
 	logger.Info(log.NewEvent(log.GenericEventType, log.RunnerComponent).WithMessage("available functions").WithArg("functions", functions.String()))

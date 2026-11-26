@@ -31,6 +31,7 @@ const (
 	ToolTypeFunction       ToolType = "function"
 	ToolTypeMCP            ToolType = "mcp"
 	ToolTypeCollection     ToolType = "collection"
+	ToolTypeApicp          ToolType = "apicp"
 )
 
 // ToolDefinition defines a tool that can be used in a session. A tool can define a function, an MCP server or a collection.
@@ -38,9 +39,9 @@ const (
 // Collection gets populated during mcp/collection tool breakdown into single functions
 // Description is the tool description. Optional, as the tool should already have a description, fill if you wish
 // to override the default
-// Type is either internet_search, function, mcp or collection
-// InputSchema defines the input schema for the tool. mcp and collection tools don't have an input schema.
-// Allowlist is a list of allowed functions when the tool is MCP or collection. If nil, all functions are allowed.
+// Type is either internet_search, function, mcp, collection or apicp
+// InputSchema defines the input schema for the tool. mcp, collection and apicp tools don't have an input schema.
+// Allowlist is a list of allowed functions when the tool is MCP, collection or apicp. If nil, all functions are allowed.
 type ToolDefinition struct {
 	Name         string         `json:"name" yaml:"name"`
 	Collection   string         `json:"-" yaml:"-"`
@@ -57,7 +58,7 @@ func (t ToolDefinition) String() string {
 		return string(ToolTypeInternetSearch)
 	case ToolTypeFunction:
 		return fmt.Sprintf("%s/%s", t.Type, t.Name)
-	case ToolTypeMCP, ToolTypeCollection:
+	case ToolTypeMCP, ToolTypeCollection, ToolTypeApicp:
 		return fmt.Sprintf("%s/%s", t.Type, t.Name)
 	}
 	return ""

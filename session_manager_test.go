@@ -137,3 +137,9 @@ func TestSessionManager_ComputeRequiredResources(t *testing.T) {
 		Identifier: "duck.txt",
 	}}, s.ComputeRequiredResources())
 }
+
+func TestRequiredTools_Check_Apicp(t *testing.T) {
+	defs := ToolDefinitions{{Name: "crm", Type: ToolTypeApicp}}
+	assert.NoError(t, RequiredTools{{Name: "crm", Type: ToolTypeApicp}}.Check(defs))
+	assert.Error(t, RequiredTools{{Name: "crm", Type: ToolTypeCollection}}.Check(defs))
+}

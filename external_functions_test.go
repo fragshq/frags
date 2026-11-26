@@ -47,3 +47,143 @@ func TestExternalFunction_Run(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, map[string]any{"yay": "bar"}, res)
 }
+
+func returning(value string) func(ctx *util.FragsContext, args map[string]any) (any, error) {
+	return func(ctx *util.FragsContext, args map[string]any) (any, error) {
+		return value, nil
+	}
+}
+
+func clashingFunctions() ExternalFunctions {
+	return ExternalFunctions{}.
+		WithFunctions(ExternalFunctions{"list_users": {Name: "list_users", Collection: "crm", Func: returning("crm")}}).
+		WithFunctions(ExternalFunctions{
+			"list_users": {Name: "list_users", Collection: "hr", Func: returning("hr")},
+			"get_user":   {Name: "get_user", Collection: "hr", Func: returning("hr_get")},
+		})
+}
+
+func TestExternalFunctions_WithFunctions_NoOverwrite(t *testing.T) {
+	fx := clashingFunctions()
+	assert.Len(t, fx, 3)
+	assert.Contains(t, fx, "crm:list_users")
+	assert.Contains(t, fx, "hr:list_users")
+	assert.Contains(t, fx, "hr:get_user")
+}
+
+func TestExternalFunctions_Resolve(t *testing.T) {
+	fx := clashingFunctions()
+
+	f, err := fx.Resolve("crm:list_users")
+	assert.NoError(t, err)
+	assert.Equal(t, "crm", f.Collection)
+
+	f, err = fx.Resolve("get_user")
+	assert.NoError(t, err)
+	assert.Equal(t, "hr:get_user", f.QualifiedName())
+
+	_, err = fx.Resolve("list_users")
+	var ambiguous *ErrAmbiguousFunction
+	assert.ErrorAs(t, err, &ambiguous)
+	assert.Equal(t, []string{"crm:list_users", "hr:list_users"}, ambiguous.Candidates)
+
+	_, err = fx.Resolve("nope")
+	var notFound *ErrFunctionNotFound
+	assert.ErrorAs(t, err, &notFound)
+
+	assert.Equal(t, map[string][]string{"list_users": {"crm:list_users", "hr:list_users"}}, fx.Collisions())
+}
+
+func TestExternalFunctions_Resolve_LegacyKeys(t *testing.T) {
+	// maps built by hand, keyed by bare name, keep working
+	fx := ExternalFunctions{"f1": {Collection: "c1", Func: returning("ok")}}
+	f, err := fx.Resolve("f1")
+	assert.NoError(t, err)
+	assert.Equal(t, "f1", f.Name)
+	f, err = fx.Resolve("c1:f1")
+	assert.NoError(t, err)
+	assert.Equal(t, "f1", f.Name)
+}
+
+func TestRunner_RunFunction_Qualified(t *testing.T) {
+	runner := NewRunner(NewSessionManager(), resources.NewDummyResourceLoader(), NewDummyAi(),
+		WithExternalFunctions(clashingFunctions()))
+	ctx := util.NewFragsContext(time.Minute)
+
+	res, err := runner.RunFunction(ctx, "hr:list_users", nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "hr", res)
+
+	res, err = runner.RunFunction(ctx, "get_user", nil)
+	assert.NoError(t, err)
+	assert.Equal(t, "hr_get", res)
+
+	_, err = runner.RunFunction(ctx, "list_users", nil)
+	assert.ErrorContains(t, err, "ambiguous")
+}
+
+func TestExternalFunction_Run_TransformerTriggers(t *testing.T) {
+	runner := NewRunner(NewSessionManager(), resources.NewDummyResourceLoader(), NewDummyAi())
+	runner.sessionManager.Transformers = &Transformers{
+		{Name: "bare", OnFunctionOutput: util.Ptr("list_users"), Expr: util.Ptr("args + \"+bare\"")},
+		{Name: "qualified", OnFunctionOutput: util.Ptr("hr:list_users"), Expr: util.Ptr("args + \"+hr\"")},
+	}
+	fx := clashingFunctions()
+	ctx := util.NewFragsContext(time.Minute)
+
+	res, err := fx.Get("crm:list_users").Run(ctx, map[string]any{}, &runner)
+	assert.NoError(t, err)
+	assert.Equal(t, "crm+bare", res)
+
+	res, err = fx.Get("hr:list_users").Run(ctx, map[string]any{}, &runner)
+	assert.NoError(t, err)
+	assert.Equal(t, "hr+bare+hr", res)
+}
+
+func TestExternalFunctions_Resolve_Prefixed(t *testing.T) {
+	fx := clashingFunctions()
+
+	f, err := fx.Resolve("crm_list_users")
+	assert.NoError(t, err)
+	assert.Equal(t, "crm:list_users", f.QualifiedName())
+
+	f, err = fx.Resolve("hr_get_user")
+	assert.NoError(t, err)
+	assert.Equal(t, "hr:get_user", f.QualifiedName())
+
+	// a function literally named like another one's prefixed name: ambiguous, no form wins
+	fx = fx.WithFunctions(ExternalFunctions{"crm_list_users": {Name: "crm_list_users", Collection: "other"}})
+	_, err = fx.Resolve("crm_list_users")
+	var ambiguous *ErrAmbiguousFunction
+	assert.ErrorAs(t, err, &ambiguous)
+	assert.Equal(t, []string{"crm:list_users", "other:crm_list_users"}, ambiguous.Candidates)
+	assert.Equal(t, []string{"crm:list_users", "other:crm_list_users"}, fx.Collisions()["crm_list_users"])
+
+	// qualified names are never ambiguous
+	f, err = fx.Resolve("other:crm_list_users")
+	assert.NoError(t, err)
+	assert.Equal(t, "other", f.Collection)
+}
+
+func TestExternalFunction_Names(t *testing.T) {
+	assert.Equal(t, []string{"list_users", "crm_list_users", "crm:list_users"},
+		ExternalFunction{Name: "list_users", Collection: "crm"}.Names())
+	assert.Equal(t, []string{"list_users"}, ExternalFunction{Name: "list_users"}.Names())
+}
+
+func TestExternalFunction_Run_PrefixedTransformerTrigger(t *testing.T) {
+	runner := NewRunner(NewSessionManager(), resources.NewDummyResourceLoader(), NewDummyAi())
+	runner.sessionManager.Transformers = &Transformers{
+		{Name: "prefixed", OnFunctionOutput: util.Ptr("hr_list_users"), Expr: util.Ptr("args + \"+prefixed\"")},
+	}
+	fx := clashingFunctions()
+	ctx := util.NewFragsContext(time.Minute)
+
+	res, err := fx.Get("hr:list_users").Run(ctx, map[string]any{}, &runner)
+	assert.NoError(t, err)
+	assert.Equal(t, "hr+prefixed", res)
+
+	res, err = fx.Get("crm:list_users").Run(ctx, map[string]any{}, &runner)
+	assert.NoError(t, err)
+	assert.Equal(t, "crm", res)
+}

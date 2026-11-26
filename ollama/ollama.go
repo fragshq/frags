@@ -9,7 +9,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"slices"
 	"strings"
 	"time"
 
@@ -124,7 +123,12 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 			TopP:        d.config.TopP,
 		},
 	}
-	request.Tools, _ = d.configureTools(tools)
+	var resolved frags.ResolvedTools
+	var err error
+	request.Tools, resolved, err = d.configureTools(tools)
+	if err != nil {
+		return nil, err
+	}
 	runner.Logger().Debug(log.NewEvent(log.GenericEventType, log.AiComponent).WithMessage("configured tools").WithEngine(engine).WithContent(request.Tools))
 	keepGoing := true
 	out := ""
@@ -138,7 +142,7 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 			}
 			d.messages = append(d.messages, responseMessage.Message)
 			if len(responseMessage.Message.ToolCalls) > 0 {
-				err := d.handleFunctionCall(ctx, responseMessage, runner)
+				err := d.handleFunctionCall(ctx, responseMessage, resolved, runner)
 				if err != nil {
 					return err
 				}
@@ -157,9 +161,9 @@ func (d *Ai) Ask(ctx *util.FragsContext, text string, sx *schema.Schema, tools f
 	return []byte(out), nil
 }
 
-func (d *Ai) handleFunctionCall(ctx *util.FragsContext, responseMessage Response, runner frags.ExportableRunner) error {
+func (d *Ai) handleFunctionCall(ctx *util.FragsContext, responseMessage Response, resolved frags.ResolvedTools, runner frags.ExportableRunner) error {
 	for _, fc := range responseMessage.Message.ToolCalls {
-		res, err := d.RunFunction(ctx, frags.FunctionCaller{Name: fc.Function.Name, Args: fc.Function.Arguments}, runner)
+		res, err := resolved.Run(ctx, fc.Function.Name, fc.Function.Arguments, runner)
 		if err != nil {
 			return err
 		}
@@ -221,45 +225,23 @@ func (d *Ai) sendRequest(ctx context.Context, request Request) (Response, error)
 	return response, err
 }
 
-func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]ToolDefinition, error) {
-	tx := make([]ToolDefinition, 0)
-	for _, tool := range tools {
-		switch tool.Type {
-		case frags.ToolTypeMCP, frags.ToolTypeCollection:
-			for k, v := range d.Functions.ListByCollection(tool.Name) {
-				if tool.Allowlist == nil || slices.Contains(*tool.Allowlist, k) {
-					tx = append(tx, ToolDefinition{
-						Type: "function",
-						Function: FunctionDef{
-							Name:        k,
-							Description: v.Description,
-							Parameters:  v.Schema,
-						},
-					})
-				}
-			}
-		case frags.ToolTypeFunction:
-			if fx, found := d.Functions[tool.Name]; found {
-				pSchema := fx.Schema
-				if tool.InputSchema != nil {
-					pSchema = tool.InputSchema
-				}
-				description := fx.Description
-				if len(tool.Description) > 0 {
-					description = tool.Description
-				}
-				tx = append(tx, ToolDefinition{
-					Type: "function",
-					Function: FunctionDef{
-						Name:        tool.Name,
-						Description: description,
-						Parameters:  pSchema,
-					},
-				})
-			}
-		}
+func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]ToolDefinition, frags.ResolvedTools, error) {
+	resolved, err := tools.Resolve(d.Functions)
+	if err != nil {
+		return nil, nil, err
 	}
-	return tx, nil
+	tx := make([]ToolDefinition, 0)
+	for _, rt := range resolved {
+		tx = append(tx, ToolDefinition{
+			Type: "function",
+			Function: FunctionDef{
+				Name:        rt.ExposedName,
+				Description: rt.Description,
+				Parameters:  rt.Schema,
+			},
+		})
+	}
+	return tx, resolved, nil
 }
 
 func (d *Ai) RunFunction(ctx *util.FragsContext, functionCall frags.FunctionCaller, runner frags.ExportableRunner) (any, error) {

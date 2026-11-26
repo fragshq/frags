@@ -21,9 +21,13 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log/slog"
+	"maps"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"github.com/fragshq/apicp"
 	apiCpCollection "github.com/fragshq/apicp/collection"
@@ -90,6 +94,44 @@ type ExtendedToolsConfig struct {
 type ApiCPConfig struct {
 	Config   apicp.ApiCP `json:"config"`
 	Disabled bool        `json:"disabled"`
+}
+
+// ScopedTo returns a copy of the configuration that only contains the MCP servers, collections and apicp instances
+// named in the plan's required tools, so that tools a plan doesn't require are neither connected nor callable (and
+// can't make a function name ambiguous). Tools are matched by name; the type is still verified later by
+// RequiredTools.Check. If the plan declares no required tools, the configuration is returned unchanged, so plans
+// without `require` statements keep seeing every configured tool.
+func (c ExtendedToolsConfig) ScopedTo(required frags.RequiredTools) ExtendedToolsConfig {
+	if len(required) == 0 {
+		return c
+	}
+	names := make(map[string]bool, len(required))
+	for _, r := range required {
+		names[r.Name] = true
+	}
+	scoped := ExtendedToolsConfig{
+		ToolsConfig: frags.ToolsConfig{
+			McpServers:  frags.McpServerConfigs{},
+			Collections: frags.ToolsCollectionConfigs{},
+		},
+		ApiCPs: map[string]ApiCPConfig{},
+	}
+	for k, v := range c.McpServers {
+		if names[k] {
+			scoped.McpServers[k] = v
+		}
+	}
+	for k, v := range c.Collections {
+		if names[k] {
+			scoped.Collections[k] = v
+		}
+	}
+	for k, v := range c.ApiCPs {
+		if names[k] {
+			scoped.ApiCPs[k] = v
+		}
+	}
+	return scoped
 }
 
 // readToolsFile reads the tools configuration file and returns the parsed configuration
@@ -161,6 +203,9 @@ func connectMcpAndCollections(ctx context.Context, toolsConfig ExtendedToolsConf
 		}
 	}
 	for k, v := range toolsConfig.ApiCPs {
+		if v.Disabled {
+			continue
+		}
 		v.Config.Logger(slog.Default())
 		client, _ := sesat2.New().Build()
 		c, err := apiCpCollection.New(k, &v.Config, client)
@@ -172,8 +217,20 @@ func connectMcpAndCollections(ctx context.Context, toolsConfig ExtendedToolsConf
 
 		toolDefinitions = append(toolDefinitions, frags.ToolDefinition{
 			Name: c.Name(),
-			Type: "aicp",
+			Type: frags.ToolTypeApicp,
 		})
 	}
+	warnFunctionCollisions(functions, logger)
 	return mcpTools, toolCollections, toolDefinitions, functions, nil
+}
+
+// warnFunctionCollisions logs a warning for each function name exposed by more than one MCP server or collection.
+// Such functions can only be called by their qualified name (collection:name).
+func warnFunctionCollisions(functions frags.ExternalFunctions, logger *log.StreamerLogger) {
+	collisions := functions.Collisions()
+	for _, name := range slices.Sorted(maps.Keys(collisions)) {
+		logger.Warn(log.NewEvent(log.GenericEventType, log.McpComponent).
+			WithMessage(fmt.Sprintf("function %s is exposed by multiple servers/collections, refer to it as one of: %s",
+				name, strings.Join(collisions[name], ", "))))
+	}
 }

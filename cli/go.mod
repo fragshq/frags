@@ -30,6 +30,7 @@ require (
 	github.com/samber/lo v1.53.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
+	github.com/stretchr/testify v1.12.1
 	github.com/theirish81/tui v0.0.0-20260802093906-22154f4c09c8
 	google.golang.org/genai v1.77.0
 	gopkg.in/yaml.v3 v3.0.1
@@ -154,3 +155,9 @@ replace github.com/fragshq/frags/chatgpt v1.0.0-rc6 => ../chatgpt
 replace github.com/fragshq/frags/anthropic v1.0.0-rc6 => ../anthropic
 
 replace github.com/fragshq/frags/gemini v1.0.0-rc3 => ../gemini
+
+replace github.com/fragshq/apicp v0.0.0-20261027102842-2ad666634504 => ../../diaphora/aacp
+
+replace github.com/fragshq/fragsfunctions/http => ../../fragsfunctions/http
+
+replace github.com/fragshq/fragsfunctions/postgres => ../../fragsfunctions/postgres

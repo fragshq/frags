@@ -48,3 +48,35 @@ func TestToolsCollectionConfigs_AsToolDefinitions(t *testing.T) {
 		assert.Equal(t, ToolTypeCollection, def.Type)
 	}
 }
+
+func TestMcpServerConfigs_AsToolDefinitions_SkipsDisabled(t *testing.T) {
+	cfg := McpServerConfigs{
+		"foo": McpServerConfig{},
+		"bar": McpServerConfig{Disabled: true},
+	}
+	defs := cfg.AsToolDefinitions()
+	assert.Len(t, defs, 1)
+	assert.Equal(t, "foo", defs[0].Name)
+}
+
+func TestToolsCollectionConfigs_AsToolDefinitions_SkipsDisabled(t *testing.T) {
+	cfg := ToolsCollectionConfigs{
+		"foo": CollectionConfig{},
+		"bar": CollectionConfig{Disabled: true},
+	}
+	defs := cfg.AsToolDefinitions()
+	assert.Len(t, defs, 1)
+	assert.Equal(t, "foo", defs[0].Name)
+}
+
+// TestRequiredTools_Check_Disabled makes sure a plan requiring a disabled tool fails the check instead of running
+// without it
+func TestRequiredTools_Check_Disabled(t *testing.T) {
+	cfg := ToolsConfig{
+		McpServers:  McpServerConfigs{"s1": {Disabled: true}},
+		Collections: ToolsCollectionConfigs{"http": {ToolType: "http", Disabled: true}},
+	}
+	defs := cfg.AsToolDefinitions()
+	assert.Error(t, RequiredTools{{Name: "s1", Type: ToolTypeMCP}}.Check(defs))
+	assert.Error(t, RequiredTools{{Name: "http", Type: ToolTypeCollection}}.Check(defs))
+}
