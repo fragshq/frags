@@ -1,3 +1,7 @@
 .env
 test_data
 mcp.json
+tools.json
+tokens.json
+frags.exe
+cli.exe
