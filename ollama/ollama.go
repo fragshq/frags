@@ -232,12 +232,18 @@ func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]ToolDefinition, frag
 	}
 	tx := make([]ToolDefinition, 0)
 	for _, rt := range resolved {
+		// Parameters has no omitempty, so a nil schema would serialize as "parameters": null.
+		// Tools without arguments get an explicit object schema instead
+		parameters := rt.Schema
+		if parameters == nil {
+			parameters = &schema.Schema{Type: schema.Object}
+		}
 		tx = append(tx, ToolDefinition{
 			Type: "function",
 			Function: FunctionDef{
 				Name:        rt.ExposedName,
 				Description: rt.Description,
-				Parameters:  rt.Schema,
+				Parameters:  parameters,
 			},
 		})
 	}
