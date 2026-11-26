@@ -212,11 +212,17 @@ func (d *Ai) configureTools(tools frags.ToolDefinitions) ([]ChatGptTool, frags.R
 	}
 	oaTools := make([]ChatGptTool, 0)
 	for _, rt := range resolved {
+		// a nil *schema.Schema inside the `any` field would not be omitted and would serialize as
+		// "parameters": null, so tools without arguments get an explicit empty object schema
+		var parameters any = map[string]any{"type": "object", "properties": map[string]any{}}
+		if rt.Schema != nil {
+			parameters = rt.Schema
+		}
 		oaTools = append(oaTools, ChatGptTool{
 			Type:        PartTypeFunction,
 			Name:        rt.ExposedName,
 			Description: rt.Description,
-			Parameters:  rt.Schema,
+			Parameters:  parameters,
 		})
 	}
 	if tools.HasType(frags.ToolTypeInternetSearch) {
