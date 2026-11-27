@@ -40,11 +40,20 @@ jobs:
           const version = "${GITHUB_REF_NAME}"
           EOF
 
+      - name: Find previous CLI tag
+        run: |
+          # Nearest cli/* tag in this commit's history, so the changelog ignores other modules' tags.
+          prev=$(git describe --tags --abbrev=0 --match 'cli/*' "${GITHUB_SHA}^" 2>/dev/null || true)
+          echo "Previous CLI tag: ${prev}"
+          echo "GORELEASER_PREVIOUS_TAG=${prev}" >> "$GITHUB_ENV"
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
           distribution: goreleaser
-          version: "~> v2"
+          # Pinned: v2.20.3+ rejects versions containing '/', which breaks our
+          # monorepo-style "cli/vX.Y.Z" tags (per-module tag_prefix is Pro-only).
+          version: "v2.20.2"
           args: release --clean --skip=validate
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
