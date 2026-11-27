@@ -50,8 +50,33 @@ func TestGetMediaType(t *testing.T) {
 		},
 		{
 			name:     "Unsupported extension",
-			filename: "image.jpg",
+			filename: "archive.xyz",
 			expected: MediaText,
+		},
+		{
+			name:     "PNG image",
+			filename: "chart.png",
+			expected: MediaPNG,
+		},
+		{
+			name:     "JPG image",
+			filename: "photo.jpg",
+			expected: MediaJPEG,
+		},
+		{
+			name:     "JPEG image, uppercase",
+			filename: "photo.JPEG",
+			expected: MediaJPEG,
+		},
+		{
+			name:     "WEBP image",
+			filename: "shot.webp",
+			expected: MediaWEBP,
+		},
+		{
+			name:     "GIF image",
+			filename: "anim.gif",
+			expected: MediaGIF,
 		},
 		{
 			name:     "No extension",

@@ -27,6 +27,11 @@ const ExtensionTXT = ".txt"
 const ExtensionMD = ".md"
 const ExtensionCSV = ".csv"
 const ExtensionJson = ".json"
+const ExtensionPNG = ".png"
+const ExtensionJPG = ".jpg"
+const ExtensionJPEG = ".jpeg"
+const ExtensionWEBP = ".webp"
+const ExtensionGIF = ".gif"
 
 // NOTE: while markdown and csv technically have their own content types, we use text/plain because the LLM either
 // doesn't care, or even likes it better.
@@ -36,6 +41,12 @@ const MediaText = "text/plain"
 const MediaMarkdown = "text/plain"
 const MediaCsv = "text/plain"
 const MediaJson = "text/plain"
+
+// image types are the ones supported by OpenAI and Anthropic vision inputs
+const MediaPNG = "image/png"
+const MediaJPEG = "image/jpeg"
+const MediaWEBP = "image/webp"
+const MediaGIF = "image/gif"
 
 // GetMediaType returns the media type for a given file extension
 func GetMediaType(filename string) string {
@@ -50,6 +61,14 @@ func GetMediaType(filename string) string {
 		return MediaCsv
 	case ExtensionJson:
 		return MediaJson
+	case ExtensionPNG:
+		return MediaPNG
+	case ExtensionJPG, ExtensionJPEG:
+		return MediaJPEG
+	case ExtensionWEBP:
+		return MediaWEBP
+	case ExtensionGIF:
+		return MediaGIF
 	}
 	return MediaText
 }
